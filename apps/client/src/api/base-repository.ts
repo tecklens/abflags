@@ -38,7 +38,6 @@ instance.interceptors.response.use(
     const status = error.response.status
 
     if (status === 401 && !window.location.href?.includes('/sign-in')){
-      debugger
       // let token = await refreshAccessToken()
       // setAccessToken(token)
 

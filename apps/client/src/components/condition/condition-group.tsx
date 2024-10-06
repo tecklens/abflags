@@ -46,7 +46,7 @@ export default function ConditionGroup({
     return valid.success
   }
   const onDragEnd = () => {
-
+    console.log('drag end');
   }
 
   const prevOnChange = (v: ConditionGroupState) => {

@@ -6,7 +6,6 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@client/components/ui/sheet';
 import { Button } from '@client/components/custom/button';
 import {
@@ -15,14 +14,7 @@ import {
   AlertTitle,
 } from '@client/components/ui/alert';
 import { IconTerminal } from '@tabler/icons-react';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@client/components/ui/tabs';
 import AddSimpleStrategy from '@client/pages/feature/strategy/simple-strategy';
-import AddVariantStrategy from '@client/pages/feature/strategy/variant-strategy';
 
 interface AddStrategyProps {
   className?: string;
@@ -30,7 +22,7 @@ interface AddStrategyProps {
   onOpenChange: (value: boolean) => void;
 }
 
-export default function AddStrategy({
+export default function AddListStrategy({
   open,
   onOpenChange,
   className = '',
@@ -40,31 +32,18 @@ export default function AddStrategy({
       <SheetContent style={{ maxWidth: '50vw' }}>
         <SheetHeader>
           <SheetTitle>Add Strategy</SheetTitle>
-          <SheetDescription>
-            <Alert>
-              <IconTerminal className="h-4 w-4" />
-              <AlertTitle>Heads up!</AlertTitle>
-              <AlertDescription>
-                This feature flag is currently enabled in the development
-                environment. Any changes made here will be available to users as
-                soon as you hit save.
-              </AlertDescription>
-            </Alert>
-          </SheetDescription>
+          <Alert>
+            <IconTerminal className="h-4 w-4" />
+            <AlertTitle>Heads up!</AlertTitle>
+            <AlertDescription>
+              This feature flag is currently enabled in the development
+              environment. Any changes made here will be available to users as
+              soon as you hit save.
+            </AlertDescription>
+          </Alert>
         </SheetHeader>
         <div className="grid gap-4 py-4">
-          <Tabs defaultValue="simple">
-            <TabsList className="env-switcher grid w-full grid-cols-2">
-              <TabsTrigger value="simple">Simple</TabsTrigger>
-              <TabsTrigger value="variant">Variants</TabsTrigger>
-            </TabsList>
-            <TabsContent value={'simple'}>
-              <AddSimpleStrategy />
-            </TabsContent>
-            <TabsContent value={'variant'}>
-              <AddVariantStrategy />
-            </TabsContent>
-          </Tabs>
+          <AddSimpleStrategy />
         </div>
         <SheetFooter>
           <SheetClose asChild>

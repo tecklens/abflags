@@ -1,15 +1,17 @@
 import {Injectable} from '@nestjs/common';
 import {ProjectEntity, ProjectRepository} from "@repository/project";
-import {IJwtPayload, MemberRoleEnum, MemberStatusEnum, ProjectDto} from "@abflags/shared";
+import { IJwtPayload, IPaginatedResponseDto, MemberRoleEnum, MemberStatusEnum, ProjectDto } from '@abflags/shared';
 import {MemberRepository} from "@repository/member";
-import {CreateProjectDto} from "@app/project/dtos";
+import { CreateProjectDto, GetVariableRequest } from '@app/project/dtos';
 import {EnvironmentService} from "@app/environment/environment.service";
+import { VariableEntity, VariableRepository } from '@repository/variable';
 
 @Injectable()
 export class ProjectService {
   constructor(
     private readonly projectRepository: ProjectRepository,
     private readonly memberRepository: MemberRepository,
+    private readonly variableRepository: VariableRepository,
     private readonly environmentService: EnvironmentService,
   ) {
   }
@@ -35,6 +37,17 @@ export class ProjectService {
 
   async getMembersActiveProject(u: IJwtPayload) {
     return this.memberRepository.findMemberByProjectId(u.projectId)
+  }
+
+  async getVariablesActiveProject(u: IJwtPayload, payload: GetVariableRequest): Promise<IPaginatedResponseDto<VariableEntity>> {
+    const rlt = await this.variableRepository.findByProjectId(u.projectId)
+
+    return {
+      page: payload.page,
+      pageSize: payload.limit,
+      data: rlt[0],
+      total: rlt[1],
+    }
   }
 
   async getById(u: IJwtPayload, id: string) {

@@ -2,7 +2,7 @@ export * from './encrypt';
 export * from './key-builder';
 import {UserPlan} from "@abflags/shared";
 
-function makeid(length: number) {1
+function makeid(length: number) {
   let result = '';
   const characters = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase();
   const charactersLength = characters.length;

@@ -16,7 +16,7 @@ export default function CustomColorPicker({hexColor, onChange}: { hexColor: stri
       ...prevState,
       hex: hexColor
     }))
-  }, [hexColor])
+  }, [hexColor, setColor])
 
   return <Popover>
     <PopoverTrigger asChild>

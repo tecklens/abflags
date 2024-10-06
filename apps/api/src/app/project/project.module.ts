@@ -6,8 +6,9 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {MemberRepository} from "@repository/member";
 import {EnvironmentRepository} from "@repository/environment";
 import {EnvironmentModule} from "@app/environment/environment.module";
+import { VariableRepository } from '@repository/variable';
 
-const repositories = [ProjectRepository, MemberRepository, EnvironmentRepository]
+const repositories = [ProjectRepository, MemberRepository, EnvironmentRepository, VariableRepository]
 
 @Module({
   imports: [EnvironmentModule, TypeOrmModule.forFeature(repositories)],

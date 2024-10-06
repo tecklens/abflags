@@ -2,7 +2,7 @@ import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride'
 import { useState } from 'react'
 import { throttle } from 'lodash'
 
-export default function SidebarTour({onOpenCollapse}: {onOpenCollapse: Function}) {
+export default function SidebarTour({onOpenCollapse}: {onOpenCollapse: () => void}) {
   const [run, setRun] = useState(false)
   const steps: Array<Step> = [
     {
@@ -21,7 +21,7 @@ export default function SidebarTour({onOpenCollapse}: {onOpenCollapse: Function}
   ]
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type } = data;
+    const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {

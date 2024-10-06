@@ -23,13 +23,15 @@ import {LimitService} from "@app/auth/limit.service";
 import {ApiKeyRepository} from "@repository/api-key";
 import {EnvironmentService} from "@app/environment/environment.service";
 import {EnvironmentModule} from "@app/environment/environment.module";
+import { VariableRepository } from '@repository/variable';
 
 const repositories = [
   UserRepository,
   MemberRepository,
   EnvironmentRepository,
   ProjectRepository,
-  ApiKeyRepository
+  ApiKeyRepository,
+  VariableRepository,
 ]
 
 @Module({

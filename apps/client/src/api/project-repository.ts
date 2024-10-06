@@ -15,6 +15,9 @@ export default {
   members() {
     return BaseRepository.get(`${resource}/members`)
   },
+  variables(params: any) {
+    return BaseRepository.get(`${resource}/variables`, {params})
+  },
   delMember(id: string) {
     return BaseRepository.delete(`${resource}/member/${id}`)
   },

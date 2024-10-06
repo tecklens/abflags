@@ -22,7 +22,7 @@ export const useFeature = create<FeatureState>((set) => ({
   },
   openNewFeature: false,
   fetchFeature: async (params: any) => {
-    FeatureRepository.all().then((rsp: AxiosResponse) => {
+    FeatureRepository.all(params).then((rsp: AxiosResponse) => {
       if (rsp.status === HttpStatusCode.Ok) {
         set({
           features: rsp.data

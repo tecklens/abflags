@@ -1,17 +1,40 @@
-import {Inject, Injectable, NotFoundException, UnauthorizedException,} from '@nestjs/common';
-import {JwtService} from '@nestjs/jwt';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import {createHash} from 'crypto';
-import {differenceInHours, differenceInMinutes, differenceInSeconds, isBefore, parseISO, subDays,} from 'date-fns';
-import {EnvironmentService} from '@app/environment/environment.service';
-import {CreateProjectDto, LoginBodyDto, PasswordResetBodyDto, UserRegistrationBodyDto,} from './dtos';
-import {EnvironmentEntity, EnvironmentRepository} from "@repository/environment";
-import {consumePoints, consumeSecondPoints, UserEntity, UserRepository} from "@repository/user";
-import {MemberEntity, MemberRepository} from "@repository/member";
-import {UserService} from "@app/user/user.service";
+import { createHash } from 'crypto';
+import {
+  differenceInHours,
+  differenceInMinutes,
+  differenceInSeconds,
+  isBefore,
+  parseISO,
+  subDays,
+} from 'date-fns';
+import { EnvironmentService } from '@app/environment/environment.service';
+import {
+  CreateProjectDto,
+  LoginBodyDto,
+  PasswordResetBodyDto,
+  UserRegistrationBodyDto,
+} from './dtos';
+import { EnvironmentRepository } from '@repository/environment';
+import {
+  consumePoints,
+  consumeSecondPoints,
+  UserEntity,
+  UserRepository,
+} from '@repository/user';
+import { MemberEntity, MemberRepository } from '@repository/member';
+import { UserService } from '@app/user/user.service';
 import {
   ApiException,
-  AuthProviderEnum, IApiKeyValid,
+  AuthProviderEnum,
+  IApiKeyValid,
   IJwtPayload,
   IUser,
   IUserResetTokenCount,
@@ -20,15 +43,17 @@ import {
   MemberStatusEnum,
   normalizeEmail,
   UserPlan,
-} from "@abflags/shared";
-import {ProjectEntity, ProjectRepository} from "@repository/project";
-import {LimitService} from "@app/auth/limit.service";
-import {CACHE_MANAGER} from "@nestjs/cache-manager";
-import {ApiKeyRepository} from "@repository/api-key";
-import {Transactional} from "typeorm-transactional";
-import {buildUserKey} from "../../utils";
-import process from "process";
-import {Cache} from 'cache-manager'
+} from '@abflags/shared';
+import { ProjectEntity, ProjectRepository } from '@repository/project';
+import { LimitService } from '@app/auth/limit.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ApiKeyRepository } from '@repository/api-key';
+import { Transactional } from 'typeorm-transactional';
+import { buildUserKey } from '../../utils';
+import process from 'process';
+import { Cache } from 'cache-manager';
+import { VariableRepository } from '@repository/variable';
+import { variableDefault } from '../../../../../libs/shared/src/lib/entities/variable/variable-default';
 
 @Injectable()
 export class AuthService {
@@ -48,11 +73,11 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly memberRepository: MemberRepository,
     private readonly projectRepository: ProjectRepository,
+    private readonly variableRepository: VariableRepository,
     private readonly apiKeyRepository: ApiKeyRepository,
     private readonly limitService: LimitService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {
-  }
+  ) {}
 
   public async validateUserLocal(
     email: string,
@@ -67,12 +92,9 @@ export class AuthService {
 
   public async validateUser(payload: IJwtPayload): Promise<IUser> {
     // We run these in parallel to speed up the query time
-    const userPromise = this.getUser({_id: payload._id});
+    const userPromise = this.getUser({ _id: payload._id });
     const isMemberPromise = payload.projectId
-      ? await this.isAuthenticatedForProject(
-        payload._id,
-        payload.projectId,
-      )
+      ? await this.isAuthenticatedForProject(payload._id, payload.projectId)
       : true;
     const [user, isMember]: [IUser, boolean] = await Promise.all([
       userPromise,
@@ -173,7 +195,7 @@ export class AuthService {
       photos: { value: string }[];
     },
   ) {
-    const {name, emails, photos} = profile;
+    const { name, emails, photos } = profile;
     const email = normalizeEmail(emails[0].value);
     let user = await this.userRepository.findByEmail(email);
     let newUser = false;
@@ -216,7 +238,7 @@ export class AuthService {
   }
 
   public async validateApiKey(apiKey: string): Promise<IJwtPayload> {
-    const {environment, user, error} = await this.getApiKeyUser({
+    const { environment, user, error } = await this.getApiKeyUser({
       apiKey,
     });
 
@@ -257,14 +279,16 @@ export class AuthService {
   }
 
   public async refreshToken(userId: string) {
-    const user = await this.getUser({_id: userId});
+    const user = await this.getUser({ _id: userId });
     if (!user) throw new UnauthorizedException('User not found');
 
-    const members = await this.memberRepository.findMemberByUserId(userId)
-    const projects = await this.projectRepository.findByProjectIdIn(members.map(e => e._projectId))
+    const members = await this.memberRepository.findMemberByUserId(userId);
+    const projects = await this.projectRepository.findByProjectIdIn(
+      members.map((e) => e._projectId),
+    );
 
     if (projects.length > 0) {
-      const activeProjectId = projects[0]._id
+      const activeProjectId = projects[0]._id;
       const userActiveProjects =
         await this.environmentRepository.findProjectEnvironments(
           activeProjectId,
@@ -282,8 +306,10 @@ export class AuthService {
   }
 
   public async generateUserToken(user: UserEntity) {
-    const members = await this.memberRepository.findMemberByUserId(user._id)
-    const projects = await this.projectRepository.findByProjectIdIn(members.map(e => e._projectId))
+    const members = await this.memberRepository.findMemberByUserId(user._id);
+    const projects = await this.projectRepository.findByProjectIdIn(
+      members.map((e) => e._projectId),
+    );
 
     if (projects && projects.length) {
       const projectToSwitch = projects[0];
@@ -322,9 +348,9 @@ export class AuthService {
   }
 
   private async switchOrg({
-                            newProjectId,
-                            userId,
-                          }: {
+    newProjectId,
+    userId,
+  }: {
     newProjectId: string;
     userId: string;
   }) {
@@ -347,7 +373,8 @@ export class AuthService {
     const user = await this.userRepository.findById(userId);
     if (!user) throw new ApiException(`User ${userId} not found`);
 
-    const environment = await this.environmentRepository.findByProject(newProjectId);
+    const environment =
+      await this.environmentRepository.findByProject(newProjectId);
 
     return await this.getSignedToken(
       user,
@@ -361,17 +388,14 @@ export class AuthService {
     userId: string,
     projectId: string,
   ): Promise<boolean> {
-    return this.memberRepository.isMemberOfProject(
-      projectId,
-      userId,
-    );
+    return this.memberRepository.isMemberOfProject(projectId, userId);
   }
 
   async switchEnvironment({
-                            newEnvironmentId,
-                            projectId,
-                            userId,
-                          }: {
+    newEnvironmentId,
+    projectId,
+    userId,
+  }: {
     newEnvironmentId: string;
     projectId: string;
     userId: string;
@@ -393,12 +417,7 @@ export class AuthService {
     const user = await this.userRepository.findById(userId);
     if (!user) throw new NotFoundException('User is not found');
 
-    return await this.getSignedToken(
-      user,
-      projectId,
-      newEnvironmentId,
-      member,
-    );
+    return await this.getSignedToken(user, projectId, newEnvironmentId, member);
   }
 
   public async getSignedToken(
@@ -409,7 +428,7 @@ export class AuthService {
   ): Promise<string> {
     const roles: MemberRoleEnum[] = [];
     if (member && member.roles) {
-      roles.push(...(member.roles?.map(e => MemberRoleEnum[e])));
+      roles.push(...member.roles?.map((e) => MemberRoleEnum[e]));
     }
 
     return this.jwtService.sign(
@@ -446,11 +465,10 @@ export class AuthService {
       firstName: body.firstName.toLowerCase(),
       lastName: body.lastName?.toLowerCase(),
       password: passwordHash,
-      billingCode: makeid(16)
+      billingCode: makeid(16),
     });
 
-    let wrapOrg: { project: ProjectEntity; environmentId: any };
-    wrapOrg = await this.createProject({
+    const newProject: { project: ProjectEntity; environmentId: any } = await this.createProject({
       name: body.projectName || body.email,
       userId: user._id,
       jobTitle: body.jobTitle,
@@ -461,8 +479,8 @@ export class AuthService {
       // user: await this.userRepository.findById(user._id),
       token: await this.getSignedToken(
         user,
-        wrapOrg.project._id,
-        wrapOrg.environmentId,
+        newProject.project._id,
+        newProject.environmentId,
         null,
       ),
     };
@@ -476,7 +494,7 @@ export class AuthService {
     const email = normalizeEmail(d.email);
     const foundUser = await this.userRepository.findByEmail(email);
     if (foundUser && foundUser.email) {
-      const {error, isBlocked} = this.isRequestBlocked(foundUser);
+      const { error, isBlocked } = this.isRequestBlocked(foundUser);
       if (isBlocked) {
         throw new UnauthorizedException(error);
       }
@@ -489,10 +507,7 @@ export class AuthService {
       );
 
       const resetTokenCount = this.getUpdatedRequestCount(foundUser);
-      await this.userRepository.updatePasswordResetToken(
-        foundUser._id,
-        token,
-      );
+      await this.userRepository.updatePasswordResetToken(foundUser._id, token);
 
       if (
         (process.env.NODE_ENV === 'dev' ||
@@ -551,8 +566,10 @@ export class AuthService {
         resetTokenCount: null,
       },
     );
-    const members = await this.memberRepository.findMemberByUserId(user._id)
-    const projects = await this.projectRepository.findByProjectIdIn(members.map(e => e._projectId))
+    const members = await this.memberRepository.findMemberByUserId(user._id);
+    const projects = await this.projectRepository.findByProjectIdIn(
+      members.map((e) => e._projectId),
+    );
 
     if (projects.length > 0) {
       const userActiveProjects =
@@ -600,8 +617,10 @@ export class AuthService {
       throw new UnauthorizedException(`Incorrect email or password provided.`);
     }
 
-    const members = await this.memberRepository.findMemberByUserId(user._id)
-    const projects = await this.projectRepository.findByProjectIdIn(members.map(e => e._projectId))
+    const members = await this.memberRepository.findMemberByUserId(user._id);
+    const projects = await this.projectRepository.findByProjectIdIn(
+      members.map((e) => e._projectId),
+    );
 
     if (projects.length > 0) {
       const userActiveProjects =
@@ -691,6 +710,7 @@ export class AuthService {
     };
   }
 
+  @Transactional()
   private async createProject(d: CreateProjectDto) {
     const user = await this.userRepository.findById(d.userId);
     if (!user) throw new ApiException('User not found');
@@ -713,6 +733,16 @@ export class AuthService {
       isDefault: true,
     });
 
+    await this.variableRepository.save(variableDefault.map(e => ({
+      name: e.name,
+      _projectId: createdProject._id,
+      type: e.type,
+      isDefault: e.isDefault,
+      required: e.required,
+      createdBy: user._id,
+      updatedBy: user._id,
+    })))
+
     const devEnv = await this.environmentService.createEnvironment(
       {
         plan: user.plan,
@@ -729,8 +759,7 @@ export class AuthService {
       },
       null,
     );
-
-    const prodEnv = await this.environmentService.createEnvironment(
+    await this.environmentService.createEnvironment(
       {
         plan: user.plan,
         _id: user._id,
@@ -746,7 +775,7 @@ export class AuthService {
       },
       devEnv._id,
     );
-
+    // create production env
     const projectAfterChanges = await this.projectRepository.findById(
       createdProject._id,
     );
@@ -775,11 +804,11 @@ export class AuthService {
   }
 
   private async addMember({
-                            projectId,
-                            userId,
-                            roles,
-                            isDefault,
-                          }: {
+    projectId,
+    userId,
+    roles,
+    isDefault,
+  }: {
     projectId: string;
     userId: string;
     roles: MemberRoleEnum[];
@@ -799,10 +828,7 @@ export class AuthService {
     );
   }
 
-  private async isMember(
-    userId: string,
-    projectId: string,
-  ): Promise<boolean> {
+  private async isMember(userId: string, projectId: string): Promise<boolean> {
     return !!(await this.memberRepository.findByUserIdAndProjectId(
       projectId,
       userId,
@@ -838,19 +864,20 @@ export class AuthService {
     // }
   }
 
-  private async getUser({_id}: { _id: string }) {
+  private async getUser({ _id }: { _id: string }) {
     return await this.userRepository.findById(_id);
   }
 
-  private async getApiKeyUser({apiKey}: { apiKey: string }): Promise<IApiKeyValid> {
-    const cachedData = await this.cacheManager.get<IApiKeyValid>(
-      apiKey
-    );
+  private async getApiKeyUser({
+    apiKey,
+  }: {
+    apiKey: string;
+  }): Promise<IApiKeyValid> {
+    const cachedData = await this.cacheManager.get<IApiKeyValid>(apiKey);
     if (cachedData) {
-      if (cachedData.environment)
-        return cachedData;
+      if (cachedData.environment) return cachedData;
       else {
-        await this.cacheManager.del(apiKey)
+        await this.cacheManager.del(apiKey);
       }
     }
     const hashedApiKey = createHash('sha256').update(apiKey).digest('hex');
@@ -861,19 +888,19 @@ export class AuthService {
 
     if (!key) {
       // Failed to find the environment for the provided API key.
-      return {error: 'API Key not found'};
+      return { error: 'API Key not found' };
     }
 
     if (!key.environment) {
-      return {error: 'API Key not found'};
+      return { error: 'API Key not found' };
     }
 
     const user = await this.userRepository.findById(key._userId);
     if (!user) {
-      return {error: 'User not found'};
+      return { error: 'User not found' };
     }
 
-    const rsp = {environment: key.environment, user: key.user};
+    const rsp = { environment: key.environment, user: key.user };
     await this.cacheManager.set(apiKey, rsp);
     return rsp;
   }

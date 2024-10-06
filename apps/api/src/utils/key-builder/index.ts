@@ -82,7 +82,6 @@ export enum CacheKeyPrefixEnum {
   FEED = 'feed',
   SUBSCRIBER = 'subscriber',
   NOTIFICATION_TEMPLATE = 'notification_template',
-  WORKFLOW_VARIABLES = 'workflow_variables',
   USER = 'user',
   INTEGRATION = 'integration',
   ENVIRONMENT_BY_API_KEY = 'environment_by_api_key',
@@ -132,19 +131,6 @@ const buildSubscriberKey = ({
     environmentId: _environmentId,
     identifierPrefix: IdentifierPrefixEnum.SUBSCRIBER_ID,
     identifier: subscriberId,
-  });
-
-const buildVariablesKey = ({
-  _environmentId,
-  _projectId,
-}: {
-  _environmentId: string;
-  _projectId: string;
-}): string =>
-  buildCommonEnvironmentKey({
-    type: CacheKeyTypeEnum.ENTITY,
-    keyEntity: CacheKeyPrefixEnum.WORKFLOW_VARIABLES,
-    environmentId: _environmentId,
   });
 
 const buildUserKey = ({ _id }: { _id: string }): string =>
@@ -258,6 +244,5 @@ export {
   buildMaximumApiRateLimitKey,
   buildEvaluateApiRateLimitKey,
   buildServiceConfigApiRateLimitMaximumKey,
-  buildVariablesKey,
   buildAuthServiceKey,
 };

@@ -14,6 +14,7 @@ import {BugReportRepository} from "@repository/bug-report";
 import {ProjectRepository} from "@repository/project";
 import {ApiKeyRepository} from "@repository/api-key";
 import {TypeOrmModule} from "@nestjs/typeorm";
+import { VariableRepository } from '@repository/variable';
 
 const repositories = [
   UserRepository,
@@ -21,6 +22,7 @@ const repositories = [
   ProjectRepository,
   MemberRepository,
   ApiKeyRepository,
+  VariableRepository,
 ]
 
 @Module({

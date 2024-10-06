@@ -5,12 +5,13 @@ import {
   GetTrackProps,
   SliderItem,
 } from 'react-compound-slider';
+import { CSSProperties } from 'react';
 
 // *******************************************************
 // RAIL
 // *******************************************************
 const railOuterStyle = {
-  position: 'absolute' as 'absolute',
+  position: 'absolute',
   width: '100%',
   height: 42,
   transform: 'translate(0%, -50%)',
@@ -18,13 +19,13 @@ const railOuterStyle = {
   cursor: 'pointer',
 };
 
-const railInnerStyle = {
-  position: 'absolute' as 'absolute',
+const railInnerStyle: CSSProperties = {
+  position: 'absolute',
   width: '100%',
   height: 10,
   transform: 'translate(0%, -50%)',
   borderRadius: 5,
-  pointerEvents: 'none' as 'none',
+  // pointerEvents: 'none',
   backgroundColor: '#607E9E',
 };
 

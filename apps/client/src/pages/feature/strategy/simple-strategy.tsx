@@ -19,6 +19,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FeatureStatus } from '@abflags/shared';
 import { Input } from '@client/components/ui/input';
 import { Switch } from '@client/components/ui/switch';
+import ConditionGroup from '@client/components/condition/condition-group';
+import StrategyCondition from '@client/pages/feature/strategy/strategy-condition';
 
 const formSchema = z.object({
   name: z
@@ -33,6 +35,7 @@ const formSchema = z.object({
   percentage: z.array(z.number()).min(1),
   stickiness: z.string(),
   groupId: z.string(),
+  conditions: z.any()
 });
 
 export default function AddSimpleStrategy() {
@@ -202,6 +205,20 @@ export default function AddSimpleStrategy() {
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="conditions"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>
+                GroupId <span className={'text-red-500'}>*</span>
+              </FormLabel>
+              <FormControl>
+                <StrategyCondition value={field.value} onChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );

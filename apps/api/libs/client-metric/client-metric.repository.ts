@@ -10,9 +10,9 @@ export class ClientMetricRepository extends Repository<ClientMetricEntity> {
   }
 
   async clearMetrics(hoursAgo: number) {
-    await this.createQueryBuilder('m')
+    await this.createQueryBuilder()
       .delete()
-      .where(`m.created_at <= INTERVAL ${hoursAgo} hour`)
+      .where(`created_at <= NOW() -  INTERVAL ${hoursAgo} hour`)
       .execute()
   }
 

@@ -28,6 +28,7 @@ export default function Invitation() {
       return
     }
 
+    setLoading(true)
     try {
       const rsp = await ProjectRepository.getInviteData(id)
       if (rsp.status === HttpStatusCode.Ok) {
@@ -39,6 +40,8 @@ export default function Invitation() {
       return (
         setError(true)
       )
+    } finally {
+      setLoading(false)
     }
 
     // if (rsp.status === HttpStatusCode.Ok) {

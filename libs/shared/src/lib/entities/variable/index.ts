@@ -1,15 +1,15 @@
-import {FeatureId, ProjectId} from "../../types";
+import { ProjectId } from '../../types';
+
+export type VariableType = 'string' | 'number' | 'text' | 'email' | 'password' | 'select' | 'date';
 
 export interface IVariable {
-  _id: string
+  _id: string;
   _projectId: ProjectId;
-  _featureId: FeatureId;
 
-
-  type: string;
+  type: VariableType;
   name: string;
   defaultValue: string;
-  isDefault: boolean
+  isDefault: boolean;
   required: boolean;
 
   createdAt: Date;

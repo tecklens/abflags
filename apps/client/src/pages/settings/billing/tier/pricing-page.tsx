@@ -112,7 +112,7 @@ const CheckIcon = ({ className }: { className?: string }) => {
 };
 
 export default function PricingPage({open}: {open: (plan: number, frequency: string) => void}) {
-  const [frequency, setFrequency] = useState(frequencies[0]);
+  const [frequency, setFrequency] = useState<PricingTierFrequency>(frequencies[0]);
   const {user} = useUser()
   console.log(user)
 
@@ -128,7 +128,7 @@ export default function PricingPage({open}: {open: (plan: number, frequency: str
               <RadioGroup
                 defaultValue={frequency.value}
                 onValueChange={(value: string) => {
-                  setFrequency(frequencies.find((f) => f.value === value)!);
+                  setFrequency(frequencies.find((f) => f.value === value) ?? frequencies[0]);
                 }}
                 className="grid gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 bg-white dark:bg-black ring-1 ring-inset ring-gray-200/30 dark:ring-gray-800"
                 style={{

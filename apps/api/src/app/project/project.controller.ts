@@ -1,10 +1,10 @@
-import {Body, Controller, Get, Param, Post, UseGuards} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import {ApiTags} from "@nestjs/swagger";
 import {JwtAuthGuard} from "@app/auth/strategy";
 import {UserSession} from "@abtypes/user.session";
 import {IJwtPayload} from "@abflags/shared";
 import {ProjectService} from "@app/project/project.service";
-import {CreateProjectDto} from "@app/project/dtos";
+import { CreateProjectDto, GetVariableRequest } from '@app/project/dtos';
 
 @Controller('project')
 @ApiTags('Project')
@@ -26,6 +26,11 @@ export class ProjectController {
   @Get('members')
   getMembersActiveProject(@UserSession() user: IJwtPayload) {
     return this.projectService.getMembersActiveProject(user)
+  }
+
+  @Get('variables')
+  getVariablesActiveProject(@UserSession() user: IJwtPayload, @Query() payload: GetVariableRequest) {
+    return this.projectService.getVariablesActiveProject(user, payload)
   }
 
   @Get(':id')

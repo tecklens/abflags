@@ -56,7 +56,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         database: config.get('MYSQL_DB'),
         entities: [...entities],
         charset: 'utf8mb4_unicode_ci',
-        synchronize: false,
+        synchronize: true,
         keepAlive: 3e4,
         connectTimeoutMS: 3e4,
         logging: ['error', 'query'],
