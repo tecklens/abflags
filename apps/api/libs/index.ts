@@ -6,3 +6,5 @@ export * from './api-key';
 export * from './project';
 export * from './feature';
 export * from './variable';
+export * from './last-seen-at-metrics';
+export * from './client-metric';

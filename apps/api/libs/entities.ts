@@ -8,6 +8,9 @@ import {MemberEntity} from "@repository/member";
 import {ProjectEntity} from "@repository/project";
 import {FeatureEntity} from "@repository/feature";
 import {VariableEntity} from "@repository/variable";
+import { EventEntity } from '@repository/event';
+import { LastSeenAtMetricsEntity } from '@repository/last-seen-at-metrics';
+import { ClientMetricDailyEntity, ClientMetricEntity } from '@repository/client-metric';
 
 export const entities = [
   UserEntity,
@@ -18,4 +21,8 @@ export const entities = [
   ProjectEntity,
   FeatureEntity,
   VariableEntity,
+  EventEntity,
+  LastSeenAtMetricsEntity,
+  ClientMetricEntity,
+  ClientMetricDailyEntity,
 ];

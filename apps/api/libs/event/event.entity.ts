@@ -8,15 +8,15 @@ import {
 } from 'typeorm';
 import {
   EnvironmentId,
-  FeatureBehavior,
   FeatureId,
-  FeatureStatus,
-  IFeature,
+  IEvent,
+  IEventType,
+  IEventTypes,
   ProjectId,
 } from '@abflags/shared';
 
-@Entity('feature')
-export class FeatureEntity implements IFeature {
+@Entity('event')
+export class EventEntity implements IEvent {
   @PrimaryGeneratedColumn('uuid')
   _id: FeatureId;
   @Column({ name: 'environment_id', type: 'varchar', length: 64 })
@@ -24,24 +24,15 @@ export class FeatureEntity implements IFeature {
   @Index()
   @Column({ name: 'project_id', type: 'varchar', length: 64 })
   _projectId: ProjectId;
-  @Column({ name: 'name', type: 'varchar', length: 64 })
-  name: string;
-  @Column({ name: 'description', type: 'varchar', length: 128, nullable: true })
-  description?: string;
-  @Column({
-    name: 'status',
-    type: 'enum',
-    enum: FeatureStatus,
-    default: FeatureStatus.ACTIVE,
-  })
-  status: FeatureStatus;
-  @Column({
-    name: 'behavior',
-    type: 'enum',
-    enum: FeatureBehavior,
-    default: FeatureBehavior.SIMPLE,
-  })
-  behavior: FeatureBehavior;
+
+  @Column({ name: 'data', type: 'simple-json', nullable: true })
+  data?: any;
+  @Column({ name: 'pre_data', type: 'simple-json', nullable: true })
+  preData: any;
+  @Column({ name: 'feature_name', type: 'varchar', length: 64 })
+  featureName: string;
+  @Column({ name: 'type', type: 'enum', enum: IEventTypes })
+  type: IEventType;
 
   @Column({ name: 'tags', type: 'simple-array', nullable: true })
   tags: string[];
