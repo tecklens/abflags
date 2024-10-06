@@ -29,7 +29,7 @@ export default function AddListStrategy({
 }: AddStrategyProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent style={{ maxWidth: '50vw' }}>
+      <SheetContent style={{ maxWidth: '50vw' }} className={'overflow-y-auto'}>
         <SheetHeader>
           <SheetTitle>Add Strategy</SheetTitle>
           <Alert>

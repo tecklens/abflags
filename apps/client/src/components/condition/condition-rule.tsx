@@ -114,7 +114,7 @@ const ConditionRuleValue = memo(
             size={15}
             className={'h-7 min-w-40'}
             type={'number'}
-            placeholder={inputProps?.props?.placeholder ?? 'Please enter input'}
+            placeholder={inputProps?.props?.placeholder ?? 'Please enter value'}
             value={value}
             onChange={(e) => {
               const val = e.target.valueAsNumber;
@@ -184,7 +184,7 @@ const ConditionRuleValue = memo(
           <Input
             type={inputProps?.type ?? 'text'}
             size={15}
-            placeholder={props?.placeholder ?? 'Please enter input'}
+            placeholder={props?.placeholder ?? 'Please enter value'}
             className={'h-7'}
             value={value}
             onChange={(e) => onChange(e.target.value)}
