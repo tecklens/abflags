@@ -1,5 +1,5 @@
 import {IMember, IMemberInvite, MemberRoleEnum, MemberStatusEnum, ProjectId} from "@abflags/shared";
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 
 @Entity('member')
 export class MemberEntity implements IMember {
@@ -23,4 +23,9 @@ export class MemberEntity implements IMember {
   _projectId: string;
   @Column({name: 'is_default', type: "boolean", nullable: true})
   isDefault: boolean;
+
+  @CreateDateColumn({name: 'created_at', type: 'datetime'})
+  createdAt: Date;
+  @UpdateDateColumn({name: 'updated_at', type: 'datetime'})
+  updatedAt: Date;
 }

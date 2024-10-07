@@ -1,4 +1,4 @@
-import {DataSource, Repository} from "typeorm";
+import {DataSource, MoreThanOrEqual, Repository} from "typeorm";
 import {AddMemberDto} from "@app/auth/dtos";
 import {MemberEntity} from "@repository/member";
 import {Injectable} from "@nestjs/common";
@@ -66,6 +66,16 @@ export class MemberRepository extends Repository<MemberEntity> {
   async countByProject(projectId: ProjectId) {
     return this.countBy({
       _projectId: projectId
+    })
+  }
+
+  async getMembersCountByProjectAfterDate(
+    projectId: string,
+    date: Date,
+  ) {
+    return this.countBy({
+      _projectId: projectId,
+      createdAt: MoreThanOrEqual(date),
     })
   }
 }

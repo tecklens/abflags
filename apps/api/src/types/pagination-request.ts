@@ -12,6 +12,7 @@ export function PaginationRequestDto(
     @ApiPropertyOptional({
       type: Number,
       required: false,
+      default: 0,
     })
     @Type(() => Number)
     @IsInt()

@@ -24,6 +24,7 @@ import {ApiKeyRepository} from "@repository/api-key";
 import {EnvironmentService} from "@app/environment/environment.service";
 import {EnvironmentModule} from "@app/environment/environment.module";
 import { VariableRepository } from '@repository/variable';
+import {BullModule} from "@nestjs/bullmq";
 
 const repositories = [
   UserRepository,
@@ -48,6 +49,9 @@ const repositories = [
       maxRedirects: 3,
     }),
     TypeOrmModule.forFeature(repositories),
+    BullModule.registerQueue({
+      name: 'event',
+    }),
   ],
   providers: [
     AuthService,

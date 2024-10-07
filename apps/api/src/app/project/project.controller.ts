@@ -2,9 +2,9 @@ import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/co
 import {ApiTags} from "@nestjs/swagger";
 import {JwtAuthGuard} from "@app/auth/strategy";
 import {UserSession} from "@abtypes/user.session";
-import {IJwtPayload} from "@abflags/shared";
+import {IJwtPayload, ProjectId} from "@abflags/shared";
 import {ProjectService} from "@app/project/project.service";
-import { CreateProjectDto, GetVariableRequest } from '@app/project/dtos';
+import {CreateProjectDto, GetVariableRequest, SearchProjectDto} from '@app/project/dtos';
 
 @Controller('project')
 @ApiTags('Project')
@@ -14,8 +14,8 @@ export class ProjectController {
   }
 
   @Get('')
-  getProject(@UserSession() user: IJwtPayload) {
-    return this.projectService.getProject(user)
+  getProject(@UserSession() user: IJwtPayload, @Query() payload: SearchProjectDto) {
+    return this.projectService.getProject(user, payload)
   }
 
   @Get('active')
@@ -31,6 +31,11 @@ export class ProjectController {
   @Get('variables')
   getVariablesActiveProject(@UserSession() user: IJwtPayload, @Query() payload: GetVariableRequest) {
     return this.projectService.getVariablesActiveProject(user, payload)
+  }
+
+  @Get('insight')
+  getProjectInsight(@UserSession() user: IJwtPayload) {
+    return this.projectService.getProjectInsights(user)
   }
 
   @Get(':id')

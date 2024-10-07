@@ -18,7 +18,7 @@ const errorHandler = (error: any) => {
 
   })
 
-  return Promise.reject({ ...error })
+  return Promise.resolve(error)
 }
 
 instance.interceptors.request.use(config => {

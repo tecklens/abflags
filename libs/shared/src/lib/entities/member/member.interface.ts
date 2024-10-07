@@ -30,4 +30,7 @@ export interface IMember {
   _projectId: ProjectId;
 
   isDefault: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
 }

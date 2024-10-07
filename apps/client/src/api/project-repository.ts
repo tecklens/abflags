@@ -3,14 +3,20 @@ import BaseRepository from '@client/api/base-repository'
 const resource = '/project'
 
 export default {
-  all() {
-    return BaseRepository.get(`${resource}`)
+  all(params: any) {
+    return BaseRepository.get(`${resource}`, {params})
   },
   active() {
     return BaseRepository.get(`${resource}/active`)
   },
   byId(id: string) {
     return BaseRepository.get(`${resource}/${id}`)
+  },
+  insights(id: string) {
+    return BaseRepository.get(`${resource}/insight`)
+  },
+  create(payload: any) {
+    return BaseRepository.post(`${resource}/`, payload)
   },
   members() {
     return BaseRepository.get(`${resource}/members`)

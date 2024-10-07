@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Query, UseGuards, UseInterceptors} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Put, Query, UseGuards, UseInterceptors} from '@nestjs/common';
 import {ApiHeader, ApiOperation, ApiSecurity, ApiTags} from "@nestjs/swagger";
 import {FeatureService} from "@app/feature/feature.service";
 import {UserSession} from "@abtypes/user.session";
@@ -43,5 +43,11 @@ export class FeatureController {
   @UseGuards(JwtAuthGuard)
   getFeatureById(@UserSession() user: IJwtPayload, @Param('id') id: FeatureId) {
     return this.featureService.getFeatureById(user, id)
+  }
+
+  @Put(':id/archive')
+  @UseGuards(JwtAuthGuard)
+  archive(@UserSession() user: IJwtPayload, @Param('id') id: FeatureId) {
+    return this.featureService.archive(user, id)
   }
 }

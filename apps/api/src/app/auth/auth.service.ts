@@ -1,40 +1,19 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import {Inject, Injectable, NotFoundException, UnauthorizedException,} from '@nestjs/common';
+import {JwtService} from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { createHash } from 'crypto';
-import {
-  differenceInHours,
-  differenceInMinutes,
-  differenceInSeconds,
-  isBefore,
-  parseISO,
-  subDays,
-} from 'date-fns';
-import { EnvironmentService } from '@app/environment/environment.service';
-import {
-  CreateProjectDto,
-  LoginBodyDto,
-  PasswordResetBodyDto,
-  UserRegistrationBodyDto,
-} from './dtos';
-import { EnvironmentRepository } from '@repository/environment';
-import {
-  consumePoints,
-  consumeSecondPoints,
-  UserEntity,
-  UserRepository,
-} from '@repository/user';
-import { MemberEntity, MemberRepository } from '@repository/member';
-import { UserService } from '@app/user/user.service';
+import {createHash} from 'crypto';
+import {differenceInHours, differenceInMinutes, differenceInSeconds, isBefore, parseISO, subDays,} from 'date-fns';
+import {EnvironmentService} from '@app/environment/environment.service';
+import {CreateProjectDto, LoginBodyDto, PasswordResetBodyDto, UserRegistrationBodyDto,} from './dtos';
+import {EnvironmentRepository} from '@repository/environment';
+import {consumePoints, consumeSecondPoints, UserEntity, UserRepository,} from '@repository/user';
+import {MemberEntity, MemberRepository} from '@repository/member';
+import {UserService} from '@app/user/user.service';
 import {
   ApiException,
   AuthProviderEnum,
   IApiKeyValid,
+  IBaseEvent,
   IJwtPayload,
   IUser,
   IUserResetTokenCount,
@@ -42,18 +21,23 @@ import {
   MemberRoleEnum,
   MemberStatusEnum,
   normalizeEmail,
+  PROJECT_CREATED,
+  ProjectMode,
+  USER_CREATED,
   UserPlan,
 } from '@abflags/shared';
-import { ProjectEntity, ProjectRepository } from '@repository/project';
-import { LimitService } from '@app/auth/limit.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { ApiKeyRepository } from '@repository/api-key';
-import { Transactional } from 'typeorm-transactional';
-import { buildUserKey } from '../../utils';
+import {ProjectEntity, ProjectRepository} from '@repository/project';
+import {LimitService} from '@app/auth/limit.service';
+import {CACHE_MANAGER} from '@nestjs/cache-manager';
+import {ApiKeyRepository} from '@repository/api-key';
+import {Transactional} from 'typeorm-transactional';
+import {buildUserKey} from '../../utils';
 import process from 'process';
-import { Cache } from 'cache-manager';
-import { VariableRepository } from '@repository/variable';
-import { variableDefault } from '../../../../../libs/shared/src/lib/entities/variable/variable-default';
+import {Cache} from 'cache-manager';
+import {VariableRepository} from '@repository/variable';
+import {variableDefault} from '../../../../../libs/shared/src/lib/entities/variable/variable-default';
+import {InjectQueue} from "@nestjs/bullmq";
+import {Queue} from "bullmq";
 
 @Injectable()
 export class AuthService {
@@ -77,6 +61,7 @@ export class AuthService {
     private readonly apiKeyRepository: ApiKeyRepository,
     private readonly limitService: LimitService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectQueue('event') private eventQueue: Queue<IBaseEvent, string, string>,
   ) {}
 
   public async validateUserLocal(
@@ -156,19 +141,17 @@ export class AuthService {
         },
       });
       newUser = true;
-
-      if (distinctId) {
-        // this.analyticsService.alias(distinctId, user._id);
-      }
-
-      // this.analyticsService.track('[Authentication] - Signup', user._id, {
-      //   loginType: authProvider,
-      //   origin: origin,
-      // });
-      await this.createProject({
+      const newProject = await this.createProject({
         name: profile.company || profile.email,
         userId: user._id,
         domain: '',
+      });
+
+      await this.eventQueue.add('action', {
+        _projectId: newProject.project._id,
+        _environmentId: newProject.environmentId,
+        tags: ['user'],
+        type: USER_CREATED,
       });
     } else {
       // TODO update info user or analysis login
@@ -221,11 +204,18 @@ export class AuthService {
       });
       newUser = true;
 
-      await this.createProject({
+      const newProject = await this.createProject({
         name: email,
         userId: user._id,
         jobTitle: '',
         domain: '',
+      });
+
+      await this.eventQueue.add('action', {
+        _projectId: newProject.project._id,
+        _environmentId: newProject.environmentId,
+        tags: ['user'],
+        type: USER_CREATED,
       });
     } else {
       // TODO update info user or analysis login
@@ -285,6 +275,8 @@ export class AuthService {
     const members = await this.memberRepository.findMemberByUserId(userId);
     const projects = await this.projectRepository.findByProjectIdIn(
       members.map((e) => e._projectId),
+      null,
+      null,
     );
 
     if (projects.length > 0) {
@@ -309,6 +301,8 @@ export class AuthService {
     const members = await this.memberRepository.findMemberByUserId(user._id);
     const projects = await this.projectRepository.findByProjectIdIn(
       members.map((e) => e._projectId),
+      null,
+      null,
     );
 
     if (projects && projects.length) {
@@ -475,6 +469,13 @@ export class AuthService {
       domain: body.domain,
     });
 
+    await this.eventQueue.add('action', {
+      _projectId: newProject.project._id,
+      _environmentId: newProject.environmentId,
+      tags: ['user'],
+      type: USER_CREATED,
+    });
+
     return {
       // user: await this.userRepository.findById(user._id),
       token: await this.getSignedToken(
@@ -569,6 +570,7 @@ export class AuthService {
     const members = await this.memberRepository.findMemberByUserId(user._id);
     const projects = await this.projectRepository.findByProjectIdIn(
       members.map((e) => e._projectId),
+      null, null
     );
 
     if (projects.length > 0) {
@@ -619,7 +621,7 @@ export class AuthService {
 
     const members = await this.memberRepository.findMemberByUserId(user._id);
     const projects = await this.projectRepository.findByProjectIdIn(
-      members.map((e) => e._projectId),
+      members.map((e) => e._projectId), null, null
     );
 
     if (projects.length > 0) {
@@ -644,9 +646,7 @@ export class AuthService {
   private getTimeDiffForAttempt(lastFailedAttempt: string) {
     const now = new Date();
     const formattedLastAttempt = parseISO(lastFailedAttempt);
-    const diff = differenceInMinutes(now, formattedLastAttempt);
-
-    return diff;
+    return differenceInMinutes(now, formattedLastAttempt);
   }
 
   private getUpdatedRequestCount(user: UserEntity): IUserResetTokenCount {
@@ -720,6 +720,9 @@ export class AuthService {
       name: d.name,
       domain: d.domain,
       description: d.description,
+      mode: ProjectMode.PRIVATE,
+      createdBy: user._id,
+      updatedBy: user._id,
     });
 
     if (d.jobTitle) {
@@ -759,7 +762,7 @@ export class AuthService {
       },
       null,
     );
-    await this.environmentService.createEnvironment(
+    const prodEnv = await this.environmentService.createEnvironment(
       {
         plan: user.plan,
         _id: user._id,
@@ -783,6 +786,20 @@ export class AuthService {
     if (projectAfterChanges !== null) {
       await this.startFreeTrial(user._id, projectAfterChanges._id);
     }
+
+    await this.eventQueue.add('action', {
+      _projectId: createdProject._id,
+      _environmentId: devEnv._id,
+      type: PROJECT_CREATED,
+      tags: ['project']
+    })
+
+    await this.eventQueue.add('action', {
+      _projectId: createdProject._id,
+      _environmentId: prodEnv._id,
+      type: PROJECT_CREATED,
+      tags: ['project']
+    })
 
     return {
       project: createdProject as ProjectEntity,

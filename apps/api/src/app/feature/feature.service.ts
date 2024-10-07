@@ -1,11 +1,25 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {FeatureEntity, FeatureRepository} from "@repository/feature";
-import {FeatureId, IJwtPayload, IPaginatedResponseDto} from "@abflags/shared";
+import {
+  FEATURE_ARCHIVED,
+  FEATURE_CREATED,
+  FeatureId,
+  FeatureStatus,
+  IBaseEvent,
+  IJwtPayload,
+  IPaginatedResponseDto
+} from "@abflags/shared";
 import {CreateFeatureRequestDto, FeatureDto, GetFeatureRequestDto} from "@app/feature/dtos";
+import {Transactional} from "typeorm-transactional";
+import {InjectQueue} from "@nestjs/bullmq";
+import {Queue} from "bullmq";
 
 @Injectable()
 export class FeatureService {
-  constructor(private readonly featureRepository: FeatureRepository) {
+  constructor(
+    private readonly featureRepository: FeatureRepository,
+    @InjectQueue('event') private eventQueue: Queue<IBaseEvent, string, string>,
+  ) {
   }
 
   async getByActiveProject(u: IJwtPayload, payload: GetFeatureRequestDto): Promise<IPaginatedResponseDto<FeatureEntity>> {
@@ -61,5 +75,29 @@ export class FeatureService {
       u.environmentId,
       id,
     )
+  }
+
+  @Transactional()
+  async archive(u: IJwtPayload, id: FeatureId) {
+    const feature = await this.featureRepository.getByEnvironmentIdAndId(
+      u.environmentId,
+      id,
+    )
+
+    if (!feature) throw new NotFoundException();
+
+    await this.eventQueue.add('action', {
+      _projectId: u.projectId,
+      _environmentId: u.environmentId,
+      type: FEATURE_ARCHIVED,
+      featureId: id,
+      tags: ['feature']
+    })
+
+    return this.featureRepository.save({
+      ...feature,
+      status: FeatureStatus.ARCHIVE,
+      archivedAt: new Date(),
+    })
   }
 }

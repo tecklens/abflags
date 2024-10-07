@@ -4,7 +4,7 @@ export interface IBaseEvent {
   type: IEventType;
   data?: any;
   preData?: any;
-  featureName: string;
+  featureId?: string;
   _projectId: ProjectId;
   _environmentId: EnvironmentId;
 

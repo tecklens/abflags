@@ -4,7 +4,7 @@ import { EventService } from '@app/event/event.service';
 import { IBaseEvent } from '@abflags/shared';
 
 @Processor('event')
-export class NotificationActionConsumer extends WorkerHost {
+export class EventActionConsumer extends WorkerHost {
   constructor(private readonly eventService: EventService) {
     super();
   }

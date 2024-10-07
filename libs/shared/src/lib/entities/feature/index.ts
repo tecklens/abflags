@@ -1,4 +1,5 @@
-import {EnvironmentId, FeatureBehavior, FeatureId, FeatureStatus, ProjectId} from "../../types";
+export * from './feature-health.interface'
+import {EnvironmentId, FeatureBehavior, FeatureId, FeatureStatus, FeatureType, ProjectId} from "../../types";
 
 export interface IFeature {
   _id: FeatureId;
@@ -6,6 +7,7 @@ export interface IFeature {
   description?: string;
 
   status: FeatureStatus;
+  type: FeatureType;
   behavior: FeatureBehavior;
   _environmentId: EnvironmentId;
   _projectId: ProjectId;
@@ -16,4 +18,5 @@ export interface IFeature {
   updatedAt: Date;
   createdBy: string;
   updatedBy: string;
+  archivedAt?: Date;
 }

@@ -4,9 +4,16 @@ import { Row } from '@tanstack/react-table';
 import { Button } from '@client/components/custom/button';
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@client/components/ui/dropdown-menu';
+import {RepositoryFactory} from "@client/api/repository-factory";
+import {AxiosResponse, HttpStatusCode} from "axios";
+import {useState} from "react";
+import {useToast} from "@client/components/ui/use-toast";
+import {get} from "lodash";
+
+const FeatureRepository = RepositoryFactory.get('feature')
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -16,6 +23,28 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const [isLoading, setIsLoading] = useState(false)
+  const {toast} = useToast()
+  const archive = (e: any) => {
+    e.stopPropagation()
+    setIsLoading(true)
+    FeatureRepository.archive(get(row.original, '_id'))
+      .then((resp: AxiosResponse) => {
+        if (resp.status === HttpStatusCode.Ok) {
+          toast({
+            title: 'Archive features successfully.'
+          })
+        }
+      })
+      .catch((e: any) => {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred while archiving the feature.'
+        })
+      })
+      .finally(() => setIsLoading(false))
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,7 +59,9 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent
         align="end"
         className="w-[160px]"
-      ></DropdownMenuContent>
+      >
+        <DropdownMenuItem onClick={archive}>Archive</DropdownMenuItem>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 }

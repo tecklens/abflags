@@ -29,7 +29,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   options: {
     label: string
     value: string
-    icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
+    icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
     color?: string
   }[]
 }

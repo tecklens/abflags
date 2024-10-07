@@ -25,7 +25,11 @@ export const statuses = [
   {
     label: 'Không Hoạt động',
     value: FeatureStatus.INACTIVE,
-  }
+  },
+  {
+    label: 'Lưu trữ',
+    value: FeatureStatus.ARCHIVE,
+  },
 ]
 
 export const priorities = [

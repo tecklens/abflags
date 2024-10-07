@@ -2,12 +2,15 @@ import {create} from 'zustand'
 import {RepositoryFactory} from '@client/api/repository-factory'
 import {AxiosError, AxiosResponse, HttpStatusCode} from 'axios'
 import {useToastGlobal} from '@client/lib/store/toastStore'
-import { IPaginatedResponseDto, IProject, IVariable, ProjectDto } from '@abflags/shared';
+import {IEvent, IPaginatedResponseDto, IProject, IProjectInsight, IVariable, ProjectDto} from '@abflags/shared';
 
 const ProjectRepository = RepositoryFactory.get('project')
 const FileRepository = RepositoryFactory.get('file')
+const EventRepository = RepositoryFactory.get('event')
 
 export interface OrgState {
+  insights: IProjectInsight | undefined;
+  fetchInsights: () => void;
   members: any[];
   fetchMembers: () => void;
   variables: IPaginatedResponseDto<IVariable>;
@@ -15,16 +18,25 @@ export interface OrgState {
   activeProject: ProjectDto | undefined;
   fetchActiveProject: () => void;
   projects: IProject[];
-  fetchProjects: () => void;
+  fetchProjects: (params: any) => void;
   openSelectProject: boolean;
   setOpenSelectProject: (v: boolean) => void;
+  eventLogs: IPaginatedResponseDto<IEvent>;
+  fetchEventLogs: (params: any) => void;
 }
 
 export const useProject = create<OrgState>((set) => ({
+  insights: undefined,
   activeProject: undefined,
   openSelectProject: false,
   members: [],
   variables: {
+    page: 0,
+    pageSize: 10,
+    data: [],
+    total: 0
+  },
+  eventLogs: {
     page: 0,
     pageSize: 10,
     data: [],
@@ -55,7 +67,21 @@ export const useProject = create<OrgState>((set) => ({
     } else {
       useToastGlobal.getState().update({
         variant: 'destructive',
-        title: 'Get variables of Organization failed'
+        title: 'Get variables of project failed'
+      })
+    }
+  },
+  fetchEventLogs: async (params: any) => {
+    const rsp = await EventRepository.byProject(params);
+
+    if (rsp.status === HttpStatusCode.Ok) {
+      set({
+        eventLogs: rsp.data
+      })
+    } else {
+      useToastGlobal.getState().update({
+        variant: 'destructive',
+        title: 'Get event logs of project failed'
       })
     }
   },
@@ -106,8 +132,8 @@ export const useProject = create<OrgState>((set) => ({
       }
     })
   },
-  fetchProjects: async () => {
-    ProjectRepository.all().then((rsp: AxiosResponse) => {
+  fetchProjects: async (params: any) => {
+    ProjectRepository.all(params).then((rsp: AxiosResponse) => {
       if (rsp.status === HttpStatusCode.Ok) {
         set({
           projects: rsp.data
@@ -115,5 +141,25 @@ export const useProject = create<OrgState>((set) => ({
       }
     })
   },
-  setOpenSelectProject: (v: boolean) => set({openSelectProject: v})
+  setOpenSelectProject: (v: boolean) => set({openSelectProject: v}),
+  fetchInsights: () => {
+    ProjectRepository.insights().then((resp: AxiosResponse) => {
+      if (resp.status === HttpStatusCode.Ok) {
+        set({
+          insights: resp.data
+        })
+      } else {
+        useToastGlobal.getState().update({
+          variant: 'destructive',
+          title: 'An error occurred while retrieving project information.'
+        })
+      }
+    })
+      .catch(() => {
+        useToastGlobal.getState().update({
+          variant: 'destructive',
+          title: 'An error occurred while retrieving project information.'
+        })
+      })
+  }
 }))

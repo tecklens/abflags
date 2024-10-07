@@ -9,13 +9,13 @@ export interface IEvent {
 
   data?: any;
   preData?: any;
-  featureName: string;
+  featureId?: string;
 
   _projectId: ProjectId;
 
   _environmentId: EnvironmentId;
 
-  tags: string[];
+  tags?: string[];
 
   createdAt: Date;
   updatedAt: Date;

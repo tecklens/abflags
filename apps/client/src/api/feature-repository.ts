@@ -13,4 +13,7 @@ export default {
   byId(id: FeatureId) {
     return BaseRepository.get(`${resource}/${id}`)
   },
+  archive(id: FeatureId) {
+    return BaseRepository.put(`${resource}/${id}/archive`)
+  }
 }

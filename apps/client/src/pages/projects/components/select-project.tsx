@@ -1,25 +1,45 @@
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@client/components/ui/dialog";
 import {Input} from "@client/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@client/components/ui/select";
-import {IconAdjustmentsHorizontal, IconSortAscendingLetters, IconSortDescendingLetters} from "@tabler/icons-react";
+import {
+  IconActivityHeartbeat,
+  IconAdjustmentsHorizontal,
+  IconHeartbeat, IconMinus,
+  IconSortAscendingLetters,
+  IconSortDescendingLetters, IconStar
+} from "@tabler/icons-react";
 import {Separator} from "@client/components/ui/separator";
 import {Link, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {useProject} from "@client/lib/store/projectStore";
 import {IProject} from "@abflags/shared";
 import {Button} from "@client/components/custom/button";
+import {getDateDistance} from "@client/lib/utils";
+import {Avatar, AvatarFallback, AvatarImage} from "@client/components/ui/avatar";
+import {throttle} from "lodash";
 
 export default function SelectProject() {
   const navigate = useNavigate()
   const {projects, fetchProjects, openSelectProject, setOpenSelectProject} = useProject()
-  const [sort, setSort] = useState('ascending')
+  const [sort, setSort] = useState('ASC')
   const [appType, setAppType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
 
+  const selectProject = (project: IProject) => {
+
+  }
+
+  const fetchData = throttle(() => {
+    fetchProjects({
+      name: searchTerm,
+      sortType: sort
+    })
+  }, 3000, {trailing: true})
+
   useEffect(() => {
     if (openSelectProject)
-      fetchProjects()
-  }, [openSelectProject])
+      fetchData()
+  }, [openSelectProject, searchTerm, sort])
 
   return (
     <Dialog open={openSelectProject} onOpenChange={setOpenSelectProject}>
@@ -49,13 +69,13 @@ export default function SelectProject() {
                 </SelectValue>
               </SelectTrigger>
               <SelectContent align="end">
-                <SelectItem value="ascending">
+                <SelectItem value="ASC">
                   <div className="flex items-center gap-4">
                     <IconSortAscendingLetters size={16}/>
                     <span>Ascending</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="descending">
+                <SelectItem value="DESC">
                   <div className="flex items-center gap-4">
                     <IconSortDescendingLetters size={16}/>
                     <span>Descending</span>
@@ -69,25 +89,59 @@ export default function SelectProject() {
             {projects.map((app: IProject) => (
               <li
                 key={app._id}
-                className="rounded-lg border p-4 hover:shadow-md"
+                className="rounded-lg border hover:shadow-md cursor-pointer"
               >
-                <div className="mb-8 flex items-center justify-between">
+                <div className="p-3 flex items-center justify-between gap-2">
                   <div
                     className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2`}
                   >
+                    <IconHeartbeat className={'text-purple-600'}/>
                   </div>
-                  {/*<Button*/}
-                  {/*  onClick={() => navigate(`/provider?open_provider=${app.id}`)}*/}
-                  {/*  variant="outline"*/}
-                  {/*  size="sm"*/}
-                  {/*  className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}*/}
-                  {/*>*/}
-                  {/*  {app.connected ? 'Connected' : 'Connect'}*/}
-                  {/*</Button>*/}
+                  <div className={'flex-1 flex flex-col'}>
+                    <div className="font-semibold">{app.name}</div>
+                    <p className="line-clamp-1 text-xs text-gray-500">Updated {getDateDistance(app.updatedAt)}</p>
+                  </div>
+                  <Button
+                    onClick={() => selectProject(app)}
+                    variant="ghost"
+                    size="icon"
+                    className={``}
+                  >
+                    <IconStar  size={18} />
+                  </Button>
                 </div>
-                <div>
-                  <h2 className="mb-1 font-semibold">{app.name}</h2>
-                  {/*<p className="line-clamp-2 text-gray-500">{app.desc}</p>*/}
+                <div className={'w-full px-3 py-2 inline-flex justify-between text-xs items-center'}>
+                  <div className={'flex flex-col'}>
+                    <span><span className={'font-semibold'}>1</span> flag</span>
+                    <span><span className={'font-semibold'}>100%</span> health</span>
+                  </div>
+
+                  {/*<div className={'inline-flex gap-1 md:gap-2 items-center'}>*/}
+                  {/*  <Button size={'icon'} variant={'secondary'} className={'h-6 w-6'}>*/}
+                  {/*    <IconMinus size={15}/>*/}
+                  {/*  </Button>*/}
+                  {/*  <span className={'text-gray-600 dark:text-gray-300'}>No activity</span>*/}
+                  {/*</div>*/}
+                  <div className={'inline-flex gap-1 md:gap-2 items-center'}>
+                    <Button size={'icon'} variant={'secondary'} className={'h-6 w-6'}>
+                      <IconActivityHeartbeat className={'text-purple-600'} size={15}/>
+                    </Button>
+                    <span className={'text-gray-600 dark:text-gray-300'}>{getDateDistance(app.updatedAt)}</span>
+                  </div>
+                </div>
+                <Separator />
+                <div className={'px-3 py-2 flex gap-2 items-center'}>
+                  <div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={app?.owner?.profilePicture ?? ''} alt="@abflags" />
+                      <AvatarFallback className={'text-sm'}>AB</AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className={'flex flex-col flex-1'}>
+                    <span>{app?.owner?.firstName}</span>
+                    <span className={'text-xs text-gray-600 dark:text-gray-300 line-clamp-1 overflow-ellipsis overflow-hidden'}>{app?.owner?.email}</span>
+                  </div>
+                  <div className={'text-xs'}>1 member</div>
                 </div>
               </li>
             ))}

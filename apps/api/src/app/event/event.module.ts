@@ -4,6 +4,7 @@ import { EventController } from './event.controller';
 import { EventRepository } from '@repository/event';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bullmq';
+import {EventActionConsumer} from "@app/event/consumer/action.consumer";
 
 const repositories = [EventRepository];
 
@@ -14,7 +15,7 @@ const repositories = [EventRepository];
     }),
     TypeOrmModule.forFeature(repositories)
   ],
-  providers: [EventService, ...repositories],
+  providers: [EventService, EventActionConsumer, ...repositories],
   controllers: [EventController],
 })
 export class EventModule {}

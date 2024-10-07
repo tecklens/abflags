@@ -1,5 +1,14 @@
-import {IBrand, IProject} from "@abflags/shared";
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {IBrand, IProject, ProjectMode} from "@abflags/shared";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
+import {UserEntity} from "@repository/user";
 
 @Entity('project')
 export class ProjectEntity implements IProject {
@@ -17,6 +26,14 @@ export class ProjectEntity implements IProject {
   name: string;
   @Column({name: 'description', length: 64, nullable: true})
   description: string;
+  @Column({name: 'mode', type: 'enum', enum: ProjectMode, nullable: true})
+  mode: ProjectMode;
+
+  @Column({name: 'archived_at', nullable: true, type: 'datetime'})
+  archivedAt: Date;
+
+  @Column({name: 'health', type: 'float', nullable: true, default: 0})
+  health: number;
 
   @CreateDateColumn({name: 'created_at'})
   createdAt: Date;
@@ -26,4 +43,8 @@ export class ProjectEntity implements IProject {
   updatedAt: Date;
   @Column({name: 'updated_by', nullable: true, length: 64})
   updatedBy: string;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn([{ name: 'created_by', referencedColumnName: '_id' }])
+  owner: UserEntity;
 }

@@ -15,6 +15,7 @@ import {ProjectRepository} from "@repository/project";
 import {ApiKeyRepository} from "@repository/api-key";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import { VariableRepository } from '@repository/variable';
+import {BullModule} from "@nestjs/bullmq";
 
 const repositories = [
   UserRepository,
@@ -33,6 +34,9 @@ const repositories = [
       maxRedirects: 2,
     }),
     TypeOrmModule.forFeature(repositories),
+    BullModule.registerQueue({
+      name: 'event',
+    }),
   ],
   providers: [
     LimitService,

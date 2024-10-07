@@ -6,6 +6,8 @@ import ProjectInfo from "@client/pages/projects/components/project-info";
 import Features from "./features";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@client/components/ui/tabs";
 import ComingSoon from "@client/components/coming-soon";
+import EventLog from "@client/pages/projects/event-log";
+import ProjectInsights from "@client/pages/projects/insights";
 
 export default function Projects() {
   return (
@@ -24,21 +26,21 @@ export default function Projects() {
         <Tabs defaultValue="overview">
           <TabsList className="env-switcher grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="insight">Insights</TabsTrigger>
             <TabsTrigger value="health">Health</TabsTrigger>
-            <TabsTrigger value="setting">Settings</TabsTrigger>
             <TabsTrigger value="event_log">Event log</TabsTrigger>
           </TabsList>
           <TabsContent value="overview">
             <Features />
           </TabsContent>
-          <TabsContent value="health">
-            <ComingSoon className="h-auto py-16" />
+          <TabsContent value="insight">
+            <ProjectInsights />
           </TabsContent>
-          <TabsContent value="setting">
-            <ComingSoon className="h-auto py-16" />
+          <TabsContent value="health">
+            <ComingSoon className="!h-auto py-16" />
           </TabsContent>
           <TabsContent value="event_log">
-            <ComingSoon className="h-auto py-16" />
+            <EventLog />
           </TabsContent>
         </Tabs>
       </LayoutBody>

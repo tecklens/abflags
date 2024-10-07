@@ -1,4 +1,4 @@
-import {DataSource, In, Repository} from "typeorm";
+import {DataSource, FindOptionsWhere, ILike, In, Repository} from "typeorm";
 import {ProjectEntity} from "@repository/project/project.entity";
 import {ProjectId} from "@abflags/shared";
 import {Injectable} from "@nestjs/common";
@@ -9,9 +9,21 @@ export class ProjectRepository extends Repository<ProjectEntity> {
     super(ProjectEntity, dataSource.createEntityManager());
   }
 
-  async findByProjectIdIn(projectIds: ProjectId[]) {
-    return this.findBy({
-      _id: In(projectIds)
+  async findByProjectIdIn(projectIds: ProjectId[], sortType: 'ASC' | 'DESC', name: string) {
+    const conditions: FindOptionsWhere<ProjectEntity> = {
+      _id: In(projectIds),
+    }
+
+    if (name) {
+      conditions.name = ILike('%' + name + '%')
+    }
+
+    return this.find({
+      where: conditions,
+      order: {
+        createdAt: sortType ?? 'DESC',
+      },
+      relations: ['owner']
     })
   }
 

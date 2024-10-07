@@ -28,14 +28,14 @@ export class EventEntity implements IEvent {
   @Column({ name: 'data', type: 'simple-json', nullable: true })
   data?: any;
   @Column({ name: 'pre_data', type: 'simple-json', nullable: true })
-  preData: any;
-  @Column({ name: 'feature_name', type: 'varchar', length: 64 })
-  featureName: string;
+  preData?: any;
+  @Column({ name: 'feature_id', type: 'varchar', length: 64, nullable: true })
+  featureId?: string;
   @Column({ name: 'type', type: 'enum', enum: IEventTypes })
   type: IEventType;
 
   @Column({ name: 'tags', type: 'simple-array', nullable: true })
-  tags: string[];
+  tags?: string[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

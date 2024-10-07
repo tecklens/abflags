@@ -1,4 +1,5 @@
 export enum FeatureStatus {
   ACTIVE = 'active',
-  INACTIVE = 'inactive'
+  INACTIVE = 'inactive',
+  ARCHIVE = 'archive'
 }
