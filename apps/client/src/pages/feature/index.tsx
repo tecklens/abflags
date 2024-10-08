@@ -1,17 +1,17 @@
-import { IFeature } from '@abflags/shared';
-import { RepositoryFactory } from '../../api/repository-factory';
+import {IFeature} from '@abflags/shared';
+import {RepositoryFactory} from '../../api/repository-factory';
 import {
   Layout,
   LayoutBody,
   LayoutHeader,
 } from '../../components/custom/layout';
-import { Search } from '../../components/search';
+import {Search} from '../../components/search';
 import ThemeSwitch from '@client/components/theme-switch';
-import { useToast } from '../../components/ui/use-toast';
-import { UserNav } from '../../components/user-nav';
-import axios, { AxiosResponse, HttpStatusCode } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useToast} from '../../components/ui/use-toast';
+import {UserNav} from '../../components/user-nav';
+import axios, {AxiosResponse, HttpStatusCode} from 'axios';
+import {useCallback, useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import FeatureInfo from './components/feature-info';
 import {
   Tabs,
@@ -29,12 +29,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '../../components/ui/breadcrumb';
+import FeatureMetric from "@client/pages/feature/components/feature-metric";
+import {StringParam, useQueryParams, withDefault} from "use-query-params";
+import EventLog from "@client/pages/feature/components/event-log";
+import FeatureSetting from "@client/pages/feature/components/feature-setting";
 
 const FeatureRepository = RepositoryFactory.get('feature');
 
 export default function FeatureDetail() {
-  const { id } = useParams();
-  const { toast } = useToast();
+  const {id} = useParams();
+
+  const [query, setQuery] = useQueryParams({
+    tab: withDefault(StringParam, 'overview'),
+  });
+  const {toast} = useToast();
   const navigate = useNavigate();
   const [feature, setFeature] = useState<IFeature | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,10 +81,10 @@ export default function FeatureDetail() {
     <Layout>
       {/* ===== Top Heading ===== */}
       <LayoutHeader>
-        <Search />
+        <Search/>
         <div className="ml-auto flex items-center space-x-4">
-          <ThemeSwitch />
-          <UserNav />
+          <ThemeSwitch/>
+          <UserNav/>
         </div>
       </LayoutHeader>
 
@@ -86,11 +94,11 @@ export default function FeatureDetail() {
             <BreadcrumbItem>
               <BreadcrumbLink href="/">Home</BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
+            <BreadcrumbSeparator/>
             <BreadcrumbItem>
               <BreadcrumbLink href="#">abflags</BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
+            <BreadcrumbSeparator/>
             <BreadcrumbItem>
               <BreadcrumbPage>{feature?.name}</BreadcrumbPage>
             </BreadcrumbItem>
@@ -98,8 +106,8 @@ export default function FeatureDetail() {
         </Breadcrumb>
         {feature ? (
           <>
-            <FeatureInfo feature={feature} />
-            <Tabs defaultValue="overview">
+            <FeatureInfo feature={feature}/>
+            <Tabs value={query.tab} onValueChange={(v) => setQuery({...query, tab: v,})}>
               <TabsList className="env-switcher grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="metric">Metric</TabsTrigger>
@@ -107,16 +115,16 @@ export default function FeatureDetail() {
                 <TabsTrigger value="event_log">Event log</TabsTrigger>
               </TabsList>
               <TabsContent value="overview">
-                <FeatureOverview feature={feature} />
+                <FeatureOverview feature={feature}/>
               </TabsContent>
               <TabsContent value="metric">
-                <ComingSoon className="h-auto py-16" />
+                <FeatureMetric/>
               </TabsContent>
               <TabsContent value="setting">
-                <ComingSoon className="h-auto py-16" />
+                <FeatureSetting feature={feature}/>
               </TabsContent>
               <TabsContent value="event_log">
-                <ComingSoon className="h-auto py-16" />
+                <EventLog id={id}/>
               </TabsContent>
             </Tabs>
           </>

@@ -31,8 +31,11 @@ export class MemberRepository extends Repository<MemberEntity> {
   async findMemberByProjectId(
     projectId: string,
   ): Promise<MemberEntity[]> {
-    return await this.findBy({
-      _projectId: projectId,
+    return await this.find({
+      where: {
+        _projectId: projectId,
+      },
+      relations: ['user']
     });
   }
 

@@ -23,17 +23,19 @@ import {
   TableRow,
 } from '@client/components/ui/table'
 
-import { DataTablePagination } from '../components/data-table-pagination'
-import { DataTableToolbar } from '../components/data-table-toolbar'
-import { useNavigate } from 'react-router-dom'
-import { get } from 'lodash'
+import {DataTablePagination} from '../components/data-table-pagination'
+import {DataTableToolbar} from '../components/data-table-toolbar'
+import {useNavigate} from 'react-router-dom'
+import {get, reduce} from 'lodash'
+import {useEffect} from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   totalCount: number,
-  onPageChange: ({ pageSize, pageIndex }: PaginationState) => void
-  page: PaginationState
+  onPageChange: ({pageSize, pageIndex}: PaginationState) => void
+  page: PaginationState,
+  onFilter: (filter: any) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -41,7 +43,8 @@ export function DataTable<TData, TValue>({
                                            data,
                                            totalCount,
                                            onPageChange,
-  page,
+                                           page,
+                                           onFilter
                                          }: DataTableProps<TData, TValue>) {
   const navigate = useNavigate()
   const [rowSelection, setRowSelection] = React.useState({})
@@ -69,6 +72,7 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    manualFiltering: true,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -78,15 +82,22 @@ export function DataTable<TData, TValue>({
     onPaginationChange: (setPagination) => {
       if (typeof setPagination !== 'function') return
 
-      const newPage =  setPagination(table.getState().pagination)
+      const newPage = setPagination(table.getState().pagination)
       onPageChange(newPage)
     },
     manualPagination: true,
   })
 
+  useEffect(() => {
+    onFilter(reduce(columnFilters, (rlt, {id, value}) => ({
+      ...rlt,
+      [id]: value,
+    }), {}))
+  }, [columnFilters]);
+
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table}/>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -140,7 +151,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table}/>
     </div>
   )
 }

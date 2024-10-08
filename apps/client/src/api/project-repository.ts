@@ -39,4 +39,7 @@ export default {
   acceptInvite(token: string) {
     return BaseRepository.post(`${resource}/invite/${token}/accept`)
   },
+  createVariable(payload: any) {
+    return BaseRepository.post(`${resource}/variable`, payload)
+  },
 }

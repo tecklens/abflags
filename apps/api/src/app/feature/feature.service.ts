@@ -1,15 +1,15 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import {FeatureEntity, FeatureRepository} from "@repository/feature";
+import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
+import {FeatureEntity, FeatureRepository, FeatureStrategyRepository} from "@repository/feature";
 import {
-  FEATURE_ARCHIVED,
-  FEATURE_CREATED,
+  FEATURE_ARCHIVED, FEATURE_CREATED, FEATURE_ENABLE,
+  FEATURE_TYPE_UPDATED,
   FeatureId,
   FeatureStatus,
   IBaseEvent,
   IJwtPayload,
   IPaginatedResponseDto
 } from "@abflags/shared";
-import {CreateFeatureRequestDto, FeatureDto, GetFeatureRequestDto} from "@app/feature/dtos";
+import {CreateFeatureRequestDto, CreateStrategyRequest, FeatureDto, GetFeatureRequestDto} from "@app/feature/dtos";
 import {Transactional} from "typeorm-transactional";
 import {InjectQueue} from "@nestjs/bullmq";
 import {Queue} from "bullmq";
@@ -18,6 +18,7 @@ import {Queue} from "bullmq";
 export class FeatureService {
   constructor(
     private readonly featureRepository: FeatureRepository,
+    private readonly featureStrategyRepository: FeatureStrategyRepository,
     @InjectQueue('event') private eventQueue: Queue<IBaseEvent, string, string>,
   ) {
   }
@@ -26,6 +27,8 @@ export class FeatureService {
     const rlt = await this.featureRepository.getByEnvIdAndProjectId(
       u.environmentId,
       u.projectId,
+      payload.name,
+      payload.status,
       payload.page * payload.limit,
       payload.limit,
     )
@@ -38,7 +41,12 @@ export class FeatureService {
   }
 
   async createFeature(u: IJwtPayload, payload: CreateFeatureRequestDto) {
-    return this.featureRepository.save({
+    const name = payload.name.trim();
+    if (await this.featureRepository.existByName(name)) {
+      throw new ConflictException('Feature name is existed')
+    }
+
+    const newFeature = await this.featureRepository.save({
       _environmentId: u.environmentId,
       _projectId: u.projectId,
       createdBy: u.email,
@@ -48,12 +56,24 @@ export class FeatureService {
       status: payload.status,
       tags: payload.tags,
     })
+
+    await this.eventQueue.add('action', {
+      _projectId: u.projectId,
+      _environmentId: u.environmentId,
+      tags: ['feature'],
+      type: FEATURE_CREATED,
+      featureId: newFeature._id
+    })
+
+    return newFeature;
   }
 
   async getByApiKey(u: IJwtPayload, payload: GetFeatureRequestDto): Promise<IPaginatedResponseDto<FeatureDto>> {
     const rlt = await this.featureRepository.getByEnvIdAndProjectId(
       u.environmentId,
       u.projectId,
+      null,
+      null,
       payload.page * payload.limit,
       payload.limit,
     )
@@ -98,6 +118,49 @@ export class FeatureService {
       ...feature,
       status: FeatureStatus.ARCHIVE,
       archivedAt: new Date(),
+    })
+  }
+
+  @Transactional()
+  async enable(u: IJwtPayload, id: FeatureId) {
+    const feature = await this.featureRepository.getByEnvironmentIdAndId(
+      u.environmentId,
+      id,
+    )
+
+    if (!feature) throw new NotFoundException();
+
+    await this.eventQueue.add('action', {
+      _projectId: u.projectId,
+      _environmentId: u.environmentId,
+      type: FEATURE_ENABLE,
+      featureId: id,
+      tags: ['feature', 'enable']
+    })
+
+    return this.featureRepository.save({
+      ...feature,
+      status: FeatureStatus.ACTIVE,
+      archivedAt: new Date(),
+    })
+  }
+
+  async createStrategy(u: IJwtPayload, id: FeatureId, payload: CreateStrategyRequest) {
+    return this.featureStrategyRepository.save({
+      featureId: id,
+      conditions: payload.conditions,
+      name: payload.name,
+      sortOrder: payload.sortOrder,
+      description: payload.description,
+      status: payload.status,
+      createdBy: u._id,
+      updatedBy: u._id,
+    })
+  }
+
+  async getAllStrategy(u: IJwtPayload, id: FeatureId) {
+    return this.featureStrategyRepository.findBy({
+      featureId: id,
     })
   }
 }

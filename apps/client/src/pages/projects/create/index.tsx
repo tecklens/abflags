@@ -43,7 +43,7 @@ export default function CreateProjectPage() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     console.log(data);
     ProjectRepository.create(data).then((resp: AxiosResponse) => {
-      if (resp.status === HttpStatusCode.Ok) {
+      if (resp.status === HttpStatusCode.Created) {
         navigate(`/`)
       }
     })

@@ -61,6 +61,7 @@ export default async function bootstrap() {
     .addTag('Feature')
     .addTag('Metric')
     .addTag('Event')
+    .addTag('Application')
     .addBearerAuth()
     .addApiKey({ type: 'apiKey', name: 'api_key', in: 'header', description: 'API Key For External calls' })
     .addServer([configService.get('CONTEXT_PATH'), apiVersion].join('/'))

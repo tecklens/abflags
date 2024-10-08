@@ -4,7 +4,7 @@ import {JwtAuthGuard} from "@app/auth/strategy";
 import {UserSession} from "@abtypes/user.session";
 import {IJwtPayload, ProjectId} from "@abflags/shared";
 import {ProjectService} from "@app/project/project.service";
-import {CreateProjectDto, GetVariableRequest, SearchProjectDto} from '@app/project/dtos';
+import {CreateProjectDto, CreateVariableDto, GetVariableRequest, SearchProjectDto} from '@app/project/dtos';
 
 @Controller('project')
 @ApiTags('Project')
@@ -46,5 +46,10 @@ export class ProjectController {
   @Post()
   createProject(@UserSession() user: IJwtPayload, @Body() payload: CreateProjectDto) {
     return this.projectService.createProject(user, payload)
+  }
+
+  @Post('variable')
+  createVariable(@UserSession() user: IJwtPayload, @Body() payload: CreateVariableDto) {
+    return this.projectService.createVariable(user, payload)
   }
 }

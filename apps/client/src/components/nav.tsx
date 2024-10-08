@@ -29,6 +29,7 @@ import { Tabs, TabsList, TabsTrigger } from '@client/components/ui/tabs';
 import { useEnv } from '@client/lib/store/envStore';
 import { throttle } from 'lodash';
 import { useProject } from '@client/lib/store/projectStore';
+import {useAuth} from "@client/context/auth";
 
 interface NavProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean;
@@ -44,6 +45,7 @@ export default function Nav({
   closeNav,
   open,
 }: NavProps) {
+  const {token} = useAuth()
   const { env, envs } = useEnv((state) => state);
   const switchEnv = useUser((state) => state.switchEnv);
   const { activeProject, fetchActiveProject, setOpenSelectProject } =
@@ -54,7 +56,7 @@ export default function Nav({
   /* Make body not scrollable when navBar is opened */
   useEffect(() => {
     fetchActiveProject();
-  }, [fetchActiveProject]);
+  }, [fetchActiveProject, token]);
   const renderLink = ({ sub, ...rest }: SideLink) => {
     const key = `${rest.title}-${rest.href}`;
     if (isCollapsed && sub)

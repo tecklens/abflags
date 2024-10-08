@@ -10,7 +10,8 @@ import {
   EnvironmentId,
   FeatureBehavior,
   FeatureId,
-  FeatureStatus, FeatureType,
+  FeatureStatus,
+  FeatureType,
   IFeature,
   ProjectId,
 } from '@abflags/shared';

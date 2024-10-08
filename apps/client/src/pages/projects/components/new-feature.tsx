@@ -32,7 +32,10 @@ const formSchema = z.object({
   name: z
     .string()
     .min(3, {message: 'Feature Key must be at least 3 characters long'})
-    .max(64, {message: 'Feature Key max 25 characters long'}),
+    .max(64, {message: 'Feature Key max 25 characters long'})
+    .refine(
+      (value) => /^[a-zA-Z][a-zA-Z0-9]*?[a-zA-Z0-9]$/.test(value ?? ""),
+      'Feature Key should contain only alphabets, _'),
   description: z.string()
     .max(128, {message: 'Description max 128 characters long'})
     .optional(),
@@ -71,6 +74,7 @@ const LIST_BEHAVIOR = [
 
 export default function NewFeature() {
   const {toast} = useToast()
+  const [isLoading, setIsLoading] = useState(false)
   const {openNewFeature, setOpenNewFeature} = useFeature()
   const [tags, setTags] = useState<Tag[]>([]);
   const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
@@ -88,11 +92,14 @@ export default function NewFeature() {
   })
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    if (isLoading) return
+    setIsLoading(true)
     FeatureRepository.create(data).then((resp: AxiosResponse) => {
       if (resp.status === HttpStatusCode.Created) {
         toast({
           title: 'Create feature successful',
         })
+        setOpenNewFeature(false)
       } else {
         toast({
           title: 'Create feature failed',
@@ -100,6 +107,9 @@ export default function NewFeature() {
         })
       }
     })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   return (
@@ -162,7 +172,7 @@ export default function NewFeature() {
                 name="tags"
                 render={({field}) => (
                   <FormItem className="space-y-1">
-                    <FormLabel>Feature Key</FormLabel>
+                    <FormLabel>Tags</FormLabel>
                     <FormControl>
                       <TagInput
                         {...field}
@@ -217,8 +227,10 @@ export default function NewFeature() {
                   <FormItem className="space-y-1">
                     <FormLabel>Percentage <span
                       className={'text-red-500'}>*</span></FormLabel>
-                    <FormDescription>The number of feature variations will have to be fully configured on the website side, otherwise it will be hidden</FormDescription>
-                    <FormDescription>Variations will be scaled according to the <b>round-robin</b> algorithm</FormDescription>
+                    <FormDescription>The number of feature variations will have to be fully configured on the website
+                      side, otherwise it will be hidden</FormDescription>
+                    <FormDescription>Variations will be scaled according to
+                      the <b>round-robin</b> algorithm</FormDescription>
                     <FormControl>
                       <Slider
                         vertical={false}
@@ -235,10 +247,10 @@ export default function NewFeature() {
                         values={field.value}
                       >
                         <Rail>
-                          {({ getRailProps }) => <SliderRail getRailProps={getRailProps} />}
+                          {({getRailProps}) => <SliderRail getRailProps={getRailProps}/>}
                         </Rail>
                         <Handles>
-                          {({ handles, getHandleProps }) => (
+                          {({handles, getHandleProps}) => (
                             <div className="slider-handles">
                               {handles.map(handle => (
                                 <KeyboardHandle
@@ -252,9 +264,9 @@ export default function NewFeature() {
                           )}
                         </Handles>
                         <Tracks left={false} right={false}>
-                          {({ tracks, getTrackProps }) => (
+                          {({tracks, getTrackProps}) => (
                             <div className="slider-tracks">
-                              {tracks.map(({ id, source, target }) => (
+                              {tracks.map(({id, source, target}) => (
                                 <Track
                                   key={id}
                                   source={source}
@@ -266,10 +278,10 @@ export default function NewFeature() {
                           )}
                         </Tracks>
                         <Ticks count={10}>
-                          {({ ticks }) => (
+                          {({ticks}) => (
                             <div className="slider-ticks">
                               {ticks.map(tick => (
-                                <Tick key={tick.id} tick={tick}  count={1}/>
+                                <Tick key={tick.id} tick={tick} count={1}/>
                               ))}
                             </div>
                           )}

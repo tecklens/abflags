@@ -1,4 +1,5 @@
 export * from './feature-health.interface'
+export * from './feature-strategy'
 import {EnvironmentId, FeatureBehavior, FeatureId, FeatureStatus, FeatureType, ProjectId} from "../../types";
 
 export interface IFeature {

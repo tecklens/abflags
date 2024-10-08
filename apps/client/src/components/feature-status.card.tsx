@@ -15,6 +15,12 @@ export default function FeatureStatusCard({status}: { status: string }) {
                 bg: '#E7FFF4',
                 label: 'Hoạt động'
             },
+      [FeatureStatus.ARCHIVE]:
+        {
+          color: '#ffa500',
+          bg: '#E7FFF4',
+          label: 'Lưu trữ'
+        },
     }
 
     // @ts-ignore

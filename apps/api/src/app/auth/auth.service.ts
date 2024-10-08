@@ -1,4 +1,4 @@
-import {Inject, Injectable, NotFoundException, UnauthorizedException,} from '@nestjs/common';
+import {ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException,} from '@nestjs/common';
 import {JwtService} from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import {createHash} from 'crypto';
@@ -24,7 +24,7 @@ import {
   PROJECT_CREATED,
   ProjectMode,
   USER_CREATED,
-  UserPlan,
+  UserPlan, variableDefault,
 } from '@abflags/shared';
 import {ProjectEntity, ProjectRepository} from '@repository/project';
 import {LimitService} from '@app/auth/limit.service';
@@ -35,7 +35,6 @@ import {buildUserKey} from '../../utils';
 import process from 'process';
 import {Cache} from 'cache-manager';
 import {VariableRepository} from '@repository/variable';
-import {variableDefault} from '../../../../../libs/shared/src/lib/entities/variable/variable-default';
 import {InjectQueue} from "@nestjs/bullmq";
 import {Queue} from "bullmq";
 
@@ -332,7 +331,7 @@ export class AuthService {
         });
       }
 
-      return await this.switchOrg({
+      return await this.switchProject({
         newProjectId: projectToSwitch._id,
         userId: user._id,
       });
@@ -341,7 +340,7 @@ export class AuthService {
     return null;
   }
 
-  private async switchOrg({
+  private async switchProject({
     newProjectId,
     userId,
   }: {
@@ -715,9 +714,13 @@ export class AuthService {
     const user = await this.userRepository.findById(d.userId);
     if (!user) throw new ApiException('User not found');
 
+    const name = d.name?.trim()
+    if (await this.projectRepository.existByName(name)) {
+      throw new ConflictException('Project name existed');
+    }
     const createdProject = await this.projectRepository.save({
       logo: d.logo,
-      name: d.name,
+      name: name,
       domain: d.domain,
       description: d.description,
       mode: ProjectMode.PRIVATE,

@@ -14,6 +14,7 @@ export const FEATURE_ENVIRONMENT_VARIANTS_UPDATED =
   'feature-environment-variants-updated';
 export const FEATURE_PROJECT_CHANGE = 'feature-project-change';
 export const FEATURE_ARCHIVED = 'feature-archived';
+export const FEATURE_ENABLE = 'feature-enable';
 export const FEATURE_REVIVED = 'feature-revived';
 export const FEATURE_IMPORT = 'feature-import';
 export const FEATURE_TAGGED = 'feature-tagged';
@@ -200,6 +201,7 @@ export const IEventTypes = [
   FEATURE_ENVIRONMENT_VARIANTS_UPDATED,
   FEATURE_PROJECT_CHANGE,
   FEATURE_ARCHIVED,
+  FEATURE_ENABLE,
   FEATURE_REVIVED,
   FEATURE_IMPORT,
   FEATURE_TAGGED,

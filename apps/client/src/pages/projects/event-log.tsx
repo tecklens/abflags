@@ -40,7 +40,7 @@ const EventCard = ({event}: {event: IEvent}) => {
         <div>Change by:</div>
         <div>{event.createdBy}</div>
       </div>
-      <div className={'flex-1 flex flex-col p-3 bg-white rounded-lg dark:bg-gray-900'}>
+      <div className={'flex-1 flex flex-col p-3 bg-white rounded-lg dark:bg-gray-800'}>
         <div>Changes:</div>
         {event.data && <JsonView data={event.data} shouldExpandNode={allExpanded} style={{
           ...defaultStyles,

@@ -27,7 +27,8 @@ import {UserSession} from "@abtypes/user.session";
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+  }
 
   @Get('/github/check')
   checkGithubAuth() {
@@ -68,7 +69,8 @@ export class AuthController {
 
   @Get('/google')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuth(@Req() req: any) {}
+  async googleAuth(@Req() req: any) {
+  }
 
   @Get('/github/callback')
   @UseGuards(GitHubAuthGuard)
@@ -127,7 +129,7 @@ export class AuthController {
   @Header('Cache-Control', 'no-store')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async projectSwitch(
+  async environmentSwitch(
     @UserSession() user: IJwtPayload,
     @Param('environmentId') environmentId: string,
   ): Promise<{ token: string }> {
@@ -148,12 +150,12 @@ export class AuthController {
     return this.authService.getRemainingRequest(user);
   }
 
-  @Post('/organizations/:organizationId/switch')
+  @Post('/project/:id/switch')
   @UseGuards(JwtAuthGuard)
-  async organizationSwitch(
+  async projectSwitch(
     @UserSession() user: IJwtPayload,
-    @Param('organizationId') organizationId: string,
+    @Param('id') pId: string,
   ): Promise<string> {
-    return await this.authService.projectSwitch(user, organizationId);
+    return await this.authService.projectSwitch(user, pId);
   }
 }

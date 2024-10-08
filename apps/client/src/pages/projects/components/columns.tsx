@@ -2,8 +2,8 @@ import {ColumnDef} from '@tanstack/react-table'
 import {DataTableColumnHeader} from './data-table-column-header'
 import {DataTableRowActions} from './data-table-row-actions'
 import {format} from 'date-fns'
-import {FeatureStatus, IFeature} from "@abflags/shared";
-import {Switch} from "@client/components/ui/switch";
+import {IFeature} from "@abflags/shared";
+import FeatureStatusCard from "../../../components/feature-status.card";
 
 export const columns: ColumnDef<IFeature>[] = [
   {
@@ -35,12 +35,10 @@ export const columns: ColumnDef<IFeature>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <Switch checked={row.getValue('status') === FeatureStatus.ACTIVE}/>
+        <FeatureStatusCard status={row.getValue('status')} />
       )
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
+    enableColumnFilter: false,
   },
   {
     id: 'actions',

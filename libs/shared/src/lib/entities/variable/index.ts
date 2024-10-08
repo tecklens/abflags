@@ -1,3 +1,4 @@
+export * from './variable-default'
 import { ProjectId } from '../../types';
 
 export type VariableType = 'string' | 'number' | 'text' | 'email' | 'password' | 'select' | 'date';

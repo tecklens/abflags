@@ -8,6 +8,9 @@ import {
   IconTrendingDown,
   IconTrendingUp
 } from "@tabler/icons-react";
+import ChartRadialLabel from "@client/pages/projects/components/insights/chart-radial-label";
+import ChartPieInteractive from "@client/pages/projects/components/insights/chart-pie-interactive";
+import {Card, CardHeader} from "@client/components/ui/card";
 
 export default function ProjectInsights() {
   const {token} = useAuth()
@@ -28,16 +31,17 @@ export default function ProjectInsights() {
       <div className={'grid grid-cols-2 gap-3'}>
         {/* total changes*/}
         <div className={'flex flex-col gap-2 rounded-lg shadow-lg p-3 dark:border'}>
-          <div className={'font-semibold inline-flex items-center gap-1'}>Total changes <IconInfoCircle size={15}/></div>
+          <div className={'font-semibold inline-flex items-center gap-1'}>Total changes <IconInfoCircle size={15}/>
+          </div>
           <div className={'flex gap-5 items-end'}>
             <div className={'font-semibold text-4xl'}>
               {insights?.stats.projectChangesCurrentWindow}
             </div>
             <div className={'flex flex-col'}>
               <div className={'inline-flex items-center gap-2 text-green-700'}>
-                  {diffTotalChange < 0
-                  ? <IconTrendingDown />
-                  : <IconTrendingUp />}
+                {diffTotalChange < 0
+                  ? <IconTrendingDown/>
+                  : <IconTrendingUp/>}
                 <span className={'text-lg font-semibold'}>{diffTotalChange}</span>
               </div>
               <span className={'text-gray-500'}>this month</span>
@@ -46,7 +50,8 @@ export default function ProjectInsights() {
         </div>
         {/*  avg time to project*/}
         <div className={'flex flex-col gap-2 rounded-lg shadow-lg p-3 dark:border'}>
-          <div className={'font-semibold inline-flex items-center gap-1'}>Avg. time to production <IconInfoCircle size={15}/></div>
+          <div className={'font-semibold inline-flex items-center gap-1'}>Avg. time to production <IconInfoCircle
+            size={15}/></div>
           <div className={'flex gap-5 items-end'}>
             <div className={'font-semibold text-lg'}>
               Coming soon
@@ -64,7 +69,8 @@ export default function ProjectInsights() {
         </div>
         {/*  featured created */}
         <div className={'flex flex-col gap-2 rounded-lg shadow-lg p-3 dark:border'}>
-          <div className={'font-semibold inline-flex items-center gap-1'}>Features created <IconInfoCircle size={15}/></div>
+          <div className={'font-semibold inline-flex items-center gap-1'}>Features created <IconInfoCircle size={15}/>
+          </div>
           <div className={'flex gap-5 items-end'}>
             <div className={'font-semibold text-4xl'}>
               {insights?.stats.featuresCreatedCurrentWindow}
@@ -72,8 +78,8 @@ export default function ProjectInsights() {
             <div className={'flex flex-col'}>
               <div className={'inline-flex items-center gap-2 text-green-700'}>
                 {diffFeatures < 0
-                  ? <IconTrendingDown />
-                  : <IconTrendingUp />}
+                  ? <IconTrendingDown/>
+                  : <IconTrendingUp/>}
                 <span className={'text-lg font-semibold'}>{diffFeatures}</span>
               </div>
               <span className={'text-gray-500'}>this month</span>
@@ -82,7 +88,8 @@ export default function ProjectInsights() {
         </div>
         {/* Features archived*/}
         <div className={'flex flex-col gap-2 rounded-lg shadow-lg p-3 dark:border'}>
-          <div className={'font-semibold inline-flex items-center gap-1'}>Features archived <IconInfoCircle size={15}/></div>
+          <div className={'font-semibold inline-flex items-center gap-1'}>Features archived <IconInfoCircle size={15}/>
+          </div>
           <div className={'flex gap-5 items-end'}>
             <div className={'font-semibold text-4xl'}>
               {insights?.stats.featuresArchivedCurrentWindow}
@@ -90,14 +97,24 @@ export default function ProjectInsights() {
             <div className={'flex flex-col'}>
               <div className={'inline-flex items-center gap-2 text-green-700'}>
                 {diffFeaturesArchived < 0
-                  ? <IconTrendingDown />
-                  : <IconTrendingUp />}
+                  ? <IconTrendingDown/>
+                  : <IconTrendingUp/>}
                 <span className={'text-lg font-semibold'}>{diffFeaturesArchived}</span>
               </div>
               <span className={'text-gray-500'}>this month</span>
             </div>
           </div>
         </div>
+      </div>
+
+      <div className={'grid grid-cols-2 gap-2'}>
+        <ChartRadialLabel/>
+        <ChartPieInteractive/>
+      </div>
+      <div className={'grid grid-cols-2 gap-2'}>
+        <Card>
+          <CardHeader>Feature types used</CardHeader>
+        </Card>
       </div>
     </div>
   )

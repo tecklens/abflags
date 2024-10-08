@@ -1,4 +1,5 @@
 import {ProjectId, UserId} from "../../types";
+import {IUser} from "../user";
 
 export enum MemberStatusEnum {
   NEW = 'new',
@@ -19,7 +20,7 @@ export interface IMember {
 
   _userId: UserId;
 
-  user?: string;
+  user?: IUser;
 
   roles: string[];
 

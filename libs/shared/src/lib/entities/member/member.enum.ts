@@ -1,4 +1,7 @@
 export enum MemberRoleEnum {
   ADMIN = 'admin',
-  MEMBER = 'member',
+  MAINTAINER = 'maintainer',
+  DEVELOPER = 'developer',
+  REPORTER = 'reporter',
+  GUEST = 'guest',
 }

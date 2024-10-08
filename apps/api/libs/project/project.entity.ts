@@ -22,7 +22,7 @@ export class ProjectEntity implements IProject {
   domain: string;
   @Column({name: 'external_id', length: 64, nullable: true})
   externalId: string;
-  @Column({name: 'name', length: 64})
+  @Column({name: 'name', length: 64, unique: true})
   name: string;
   @Column({name: 'description', length: 64, nullable: true})
   description: string;
@@ -45,6 +45,6 @@ export class ProjectEntity implements IProject {
   updatedBy: string;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn([{ name: 'created_by', referencedColumnName: '_id' }])
+  @JoinColumn([{name: 'created_by', referencedColumnName: '_id'}])
   owner: UserEntity;
 }

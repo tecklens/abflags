@@ -13,4 +13,11 @@ export class VariableRepository extends Repository<VariableEntity> {
       _projectId: projectId,
     });
   }
+
+  async existByName(name: string, projectId: string) {
+    return this.existsBy({
+      name: name,
+      _projectId: projectId,
+    })
+  }
 }

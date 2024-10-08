@@ -8,3 +8,4 @@ export * from './feature';
 export * from './variable';
 export * from './last-seen-at-metrics';
 export * from './client-metric';
+export * from './application';

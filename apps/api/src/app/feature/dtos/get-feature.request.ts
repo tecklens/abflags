@@ -1,4 +1,6 @@
 import {PaginationWithFiltersRequestDto} from "@abtypes/pagination-with-filters-request";
+import {ApiPropertyOptional} from "@nestjs/swagger";
+import {IsArray, IsOptional, IsString} from "class-validator";
 
 export class GetFeatureRequestDto extends PaginationWithFiltersRequestDto({
   defaultLimit: 10,
@@ -9,5 +11,12 @@ export class GetFeatureRequestDto extends PaginationWithFiltersRequestDto({
   page: number;
   limit: number;
 
-  status: number[];
+  @ApiPropertyOptional()
+  @IsArray()
+  @IsOptional()
+  status: string[];
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  name: string;
 }

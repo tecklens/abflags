@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {ConflictException, Injectable} from '@nestjs/common';
 import {ProjectEntity, ProjectRepository} from "@repository/project";
 import {
   FeatureStatus,
@@ -10,10 +10,10 @@ import {
   MemberStatusEnum,
   PROJECT_CREATED,
   ProjectDto,
-  ProjectId, ProjectMode
+  ProjectId, ProjectMode, variableDefault
 } from '@abflags/shared';
 import {MemberRepository} from "@repository/member";
-import {CreateProjectDto, GetVariableRequest, SearchProjectDto} from '@app/project/dtos';
+import {CreateProjectDto, CreateVariableDto, GetVariableRequest, SearchProjectDto} from '@app/project/dtos';
 import {EnvironmentService} from "@app/environment/environment.service";
 import {VariableEntity, VariableRepository} from '@repository/variable';
 import {ProjectStatsRepository} from "@repository/project-stats";
@@ -95,9 +95,13 @@ export class ProjectService {
 
   @Transactional()
   async createProject(u: IJwtPayload, payload: CreateProjectDto) {
+    const name = payload.name?.trim()
+    if (await this.projectRepository.existByName(name)) {
+      throw new ConflictException('Project name existed');
+    }
     const createdProject = await this.projectRepository.save({
       logo: payload.logo,
-      name: payload.name,
+      name: name,
       domain: payload.domain,
       description: payload.description,
       mode: ProjectMode.PRIVATE,
@@ -111,6 +115,16 @@ export class ProjectService {
       userId: u._id,
       isDefault: true,
     });
+
+    await this.variableRepository.save(variableDefault.map(e => ({
+      name: e.name,
+      _projectId: createdProject._id,
+      type: e.type,
+      isDefault: e.isDefault,
+      required: e.required,
+      createdBy: u._id,
+      updatedBy: u._id,
+    })))
 
     const devEnv = await this.environmentService.createEnvironment(
       {
@@ -308,5 +322,20 @@ export class ProjectService {
     }
 
     return {status: 'onboarded'};
+  }
+
+  async createVariable(u: IJwtPayload, payload: CreateVariableDto) {
+    const name = payload.name.trim()
+    if (await this.variableRepository.existByName(name, u.projectId)) {
+      throw new ConflictException('Variable name existed')
+    }
+    return this.variableRepository.save({
+      _projectId: u.projectId,
+      name: name,
+      defaultValue: payload.defaultValue,
+      isDefault: false,
+      required: payload.required,
+      type: payload.type,
+    })
   }
 }

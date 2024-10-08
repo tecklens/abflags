@@ -1,4 +1,4 @@
-import {Between, DataSource, FindOptionsWhere, In, MoreThanOrEqual, Repository} from "typeorm";
+import {Between, DataSource, FindOptionsWhere, ILike, In, MoreThanOrEqual, Repository} from "typeorm";
 import {Injectable} from "@nestjs/common";
 import {FeatureEntity} from "@repository/feature/feature.entity";
 import {EnvironmentId, FeatureId, FeatureStatus, ProjectId} from "@abflags/shared";
@@ -12,14 +12,19 @@ export class FeatureRepository extends Repository<FeatureEntity> {
   async getByEnvIdAndProjectId(
     environmentId: EnvironmentId,
     projectId: ProjectId,
+    name: string,
+    status: string[],
     skip: number,
     take: number,
   ) {
+    const conditions: FindOptionsWhere<FeatureEntity> = {
+      _projectId: projectId,
+      _environmentId: environmentId,
+    }
+    if (status) conditions.status = In(status)
+    if (name) conditions.name = ILike('%' + name + '%')
     return this.findAndCount({
-      where: {
-        _projectId: projectId,
-        _environmentId: environmentId,
-      },
+      where: conditions,
       order: {
         createdAt: 'DESC',
       },
@@ -79,5 +84,11 @@ export class FeatureRepository extends Repository<FeatureEntity> {
       .where(`project_id = '${projectId}' and environment_id = '${environmentId}' and status in (:status)`, {status: status})
       .groupBy('type')
       .getRawMany();
+  }
+
+  async existByName(name: string) {
+    return this.existsBy({
+      name: name
+    })
   }
 }

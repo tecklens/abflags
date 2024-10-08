@@ -5,15 +5,17 @@ import {Button} from '@client/components/custom/button'
 import {Input} from '@client/components/ui/input'
 import {DataTableViewOptions} from '../components/data-table-view-options'
 
-import {IconRefresh} from '@tabler/icons-react'
+import {IconPlus, IconRefresh} from '@tabler/icons-react'
+import React from "react";
+import AddVariable from "@client/pages/variable/components/add-variable";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
 }
 
 export function DataTableToolbar<TData>({
-  table,
-}: DataTableToolbarProps<TData>) {
+                                          table,
+                                        }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -34,11 +36,14 @@ export function DataTableToolbar<TData>({
             className='h-8 px-2 lg:px-3'
           >
             Reset
-            <Cross2Icon className='ml-2 h-4 w-4' />
+            <Cross2Icon className='ml-2 h-4 w-4'/>
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className={'inline-flex gap-2'}>
+        <AddVariable />
+        <DataTableViewOptions table={table}/>
+      </div>
     </div>
   )
 }

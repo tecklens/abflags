@@ -20,6 +20,18 @@ import { FeatureStatus } from '@abflags/shared';
 import { Input } from '@client/components/ui/input';
 import { Switch } from '@client/components/ui/switch';
 import { StrategyTargets } from '@client/pages/feature/strategy/strategy-targets';
+import {useAuth} from "@client/context/auth";
+import {useProject} from "@client/lib/store/projectStore";
+import React, {useEffect} from "react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from "@client/components/ui/select";
 
 const formSchema = z.object({
   name: z
@@ -38,6 +50,9 @@ const formSchema = z.object({
 });
 
 export default function AddSimpleStrategy() {
+  const {token} = useAuth()
+  const {variables, fetchVariables} = useProject()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,9 +72,16 @@ export default function AddSimpleStrategy() {
     console.log(data);
   }
 
+  useEffect(() => {
+    fetchVariables({
+      page: 0,
+      limit: 50
+    })
+  }, [token])
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={'grid gap-3 overflow-y-auto overflow-x-hidden'}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className={'grid gap-3 overflow-y-auto overflow-x-hidden px-3'}>
         <FormField
           control={form.control}
           name="name"
@@ -189,7 +211,28 @@ export default function AddSimpleStrategy() {
                   Stickiness <span className={'text-red-500'}>*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder={'Stickiness'} {...field} />
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) => {
+                      field.onChange(v)
+                    }}
+                  >
+                    <SelectTrigger className="py-0">
+                      <SelectValue placeholder="Select a variable">
+                        {variables?.data?.find(e => e._id === field.value)?.name}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Select one variable</SelectLabel>
+                        {variables?.data?.map((e) => (
+                          <SelectItem key={e._id} value={e._id}>
+                            {e.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               </FormItem>
             )}

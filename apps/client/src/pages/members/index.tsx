@@ -41,12 +41,12 @@ export default function Members() {
   const { members, fetchMembers } = useProject()
   const { token } = useAuth()
   const [loading, setLoading] = useState(false)
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-    },
-  })
+    const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        email: '',
+      },
+    })
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setLoading(true)
@@ -142,7 +142,7 @@ export default function Members() {
       <LayoutBody className="flex flex-col space-y-4" fixedHeight>
         <div className="flex items-center justify-between space-y-2">
           <div className={'inline-flex space-x-2 items-center'}>
-            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+            <h1 className="text-xl font-bold tracking-tight md:text-2xl">
               Members
             </h1>
           </div>

@@ -23,6 +23,8 @@ export interface OrgState {
   setOpenSelectProject: (v: boolean) => void;
   eventLogs: IPaginatedResponseDto<IEvent>;
   fetchEventLogs: (params: any) => void;
+  eventLogsFeature: IPaginatedResponseDto<IEvent>;
+  fetchEventLogsFeature: (id: string, params: any) => void;
 }
 
 export const useProject = create<OrgState>((set) => ({
@@ -37,6 +39,12 @@ export const useProject = create<OrgState>((set) => ({
     total: 0
   },
   eventLogs: {
+    page: 0,
+    pageSize: 10,
+    data: [],
+    total: 0
+  },
+  eventLogsFeature: {
     page: 0,
     pageSize: 10,
     data: [],
@@ -82,6 +90,20 @@ export const useProject = create<OrgState>((set) => ({
       useToastGlobal.getState().update({
         variant: 'destructive',
         title: 'Get event logs of project failed'
+      })
+    }
+  },
+  fetchEventLogsFeature: async (id: string, params: any) => {
+    const rsp = await EventRepository.byFeatureId(id, params);
+
+    if (rsp.status === HttpStatusCode.Ok) {
+      set({
+        eventLogsFeature: rsp.data
+      })
+    } else {
+      useToastGlobal.getState().update({
+        variant: 'destructive',
+        title: 'Get event logs of feature failed'
       })
     }
   },

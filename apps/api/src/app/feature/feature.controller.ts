@@ -3,7 +3,7 @@ import {ApiHeader, ApiOperation, ApiSecurity, ApiTags} from "@nestjs/swagger";
 import {FeatureService} from "@app/feature/feature.service";
 import {UserSession} from "@abtypes/user.session";
 import {FeatureId, IJwtPayload} from "@abflags/shared";
-import {CreateFeatureRequestDto, FeatureDto, GetFeatureRequestDto} from "@app/feature/dtos";
+import {CreateFeatureRequestDto, CreateStrategyRequest, FeatureDto, GetFeatureRequestDto} from "@app/feature/dtos";
 import {ApiKeyAuthGuard, JwtAuthGuard} from "@app/auth/strategy";
 import {ApiResponse, ExternalApiAccessible} from "@abtypes/decorators";
 import {CacheInterceptor} from "@nestjs/cache-manager";
@@ -49,5 +49,30 @@ export class FeatureController {
   @UseGuards(JwtAuthGuard)
   archive(@UserSession() user: IJwtPayload, @Param('id') id: FeatureId) {
     return this.featureService.archive(user, id)
+  }
+
+  @Put(':id/enable')
+  @UseGuards(JwtAuthGuard)
+  enable(@UserSession() user: IJwtPayload, @Param('id') id: FeatureId) {
+    return this.featureService.enable(user, id)
+  }
+
+  @Post(':id/strategy')
+  @UseGuards(JwtAuthGuard)
+  createStrategy(
+    @UserSession() user: IJwtPayload,
+    @Param('id') id: FeatureId,
+    @Body() payload: CreateStrategyRequest,
+  ) {
+    return this.featureService.createStrategy(user, id, payload)
+  }
+
+  @Get(':id/strategy')
+  @UseGuards(JwtAuthGuard)
+  getAllStrategy(
+    @UserSession() user: IJwtPayload,
+    @Param('id') id: FeatureId,
+  ) {
+    return this.featureService.getAllStrategy(user, id)
   }
 }

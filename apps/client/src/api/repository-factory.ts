@@ -8,6 +8,7 @@ import NotificationRepository from '@client/api/notification-repository'
 import FileRepository from '@client/api/file-repository'
 import FeatureRepository from "@client/api/feature-repository";
 import EventRepository from "@client/api/event-repository";
+import ApplicationRepository from "@client/api/application-repository";
 
 const repositories = {
   auth: AuthRepository,
@@ -19,10 +20,11 @@ const repositories = {
   file: FileRepository,
   feature: FeatureRepository,
   event: EventRepository,
+  app: ApplicationRepository,
 }
 
 export const RepositoryFactory: {
-  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'anal' | 'file' | 'event') => any
+  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'anal' | 'file' | 'event' | 'app') => any
 } = {
-  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'anal' | 'file' | 'event') => get(repositories, name)
+  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'anal' | 'file' | 'event' | 'app') => get(repositories, name)
 }

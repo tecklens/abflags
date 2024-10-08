@@ -15,5 +15,14 @@ export default {
   },
   archive(id: FeatureId) {
     return BaseRepository.put(`${resource}/${id}/archive`)
+  },
+  enable(id: FeatureId) {
+    return BaseRepository.put(`${resource}/${id}/enable`)
+  },
+  createStrategy(id: FeatureId, payload: any) {
+    return BaseRepository.post(`${resource}/${id}/strategy`, payload)
+  },
+  getAllStrategy(id: FeatureId) {
+    return BaseRepository.get(`${resource}/${id}/strategy`)
   }
 }

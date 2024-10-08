@@ -1,5 +1,14 @@
 import {IMember, IMemberInvite, MemberRoleEnum, MemberStatusEnum, ProjectId} from "@abflags/shared";
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
+import {UserEntity} from "@repository/user";
 
 @Entity('member')
 export class MemberEntity implements IMember {
@@ -7,9 +16,6 @@ export class MemberEntity implements IMember {
   _id: string;
   @Column({name: 'user_id', length: 64})
   _userId: string;
-
-  @Column({name: 'user', length: 64, nullable: true})
-  user?: string;
 
   @Column({name: 'roles', type: 'simple-array', nullable: true})
   roles: string[];
@@ -28,4 +34,8 @@ export class MemberEntity implements IMember {
   createdAt: Date;
   @UpdateDateColumn({name: 'updated_at', type: 'datetime'})
   updatedAt: Date;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn([{ name: 'user_id', referencedColumnName: '_id' }])
+  user: UserEntity;
 }

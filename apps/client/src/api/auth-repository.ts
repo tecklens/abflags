@@ -1,13 +1,13 @@
-import BaseRepository from '@client/api/base-repository.ts'
-import { UserInterface } from '@/types/user.interface.ts'
+import BaseRepository from '@client/api/base-repository'
+import {IUser} from "@abflags/shared";
 
 const resource = '/auth'
 
 export default {
-  login(payload: UserInterface) {
+  login(payload: IUser) {
     return BaseRepository.post(`${resource}/login`, payload)
   },
-  register(payload: UserInterface) {
+  register(payload: IUser) {
     return BaseRepository.post(`${resource}/register`, payload)
   },
   checkGithubAuth() {
@@ -24,10 +24,10 @@ export default {
       params: payload,
     })
   },
-  sendEmailResetPass(payload: UserInterface) {
+  sendEmailResetPass(payload: IUser) {
     return BaseRepository.post(`${resource}/reset/request`, payload)
   },
-  forgotPass(payload: UserInterface) {
+  forgotPass(payload: IUser) {
     return BaseRepository.post(`${resource}/reset`, payload)
   },
   switchEnv(envId: string) {
@@ -36,7 +36,7 @@ export default {
   getRemainingRequest() {
     return BaseRepository.get(`${resource}/limit/remaining`)
   },
-  switchOrg(organizationId: string) {
-    return BaseRepository.post(`${resource}/organizations/${organizationId}/switch`)
+  switchProject(projectId: string) {
+    return BaseRepository.post(`${resource}/project/${projectId}/switch`)
   }
 }

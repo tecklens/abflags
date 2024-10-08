@@ -32,4 +32,10 @@ export class ProjectRepository extends Repository<ProjectEntity> {
       _id: projectId
     })
   }
+
+  async existByName(name: string) {
+    return this.existsBy({
+      name: name
+    })
+  }
 }

@@ -18,6 +18,7 @@ import { EventModule } from './event/event.module';
 import { BullModule } from '@nestjs/bullmq';
 import { MetricModule } from './metric/metric.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ApplicationModule } from './application/application.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     FeatureModule,
     EventModule,
     MetricModule,
+    ApplicationModule,
   ],
   controllers: [],
   providers: [

@@ -12,6 +12,7 @@ import {AxiosResponse, HttpStatusCode} from "axios";
 import {useState} from "react";
 import {useToast} from "@client/components/ui/use-toast";
 import {get} from "lodash";
+import {FeatureStatus} from "@abflags/shared";
 
 const FeatureRepository = RepositoryFactory.get('feature')
 
@@ -32,7 +33,7 @@ export function DataTableRowActions<TData>({
       .then((resp: AxiosResponse) => {
         if (resp.status === HttpStatusCode.Ok) {
           toast({
-            title: 'Archive features successfully.'
+            title: 'Archive features successfully. Wait 10s for refresh'
           })
         }
       })
@@ -40,6 +41,26 @@ export function DataTableRowActions<TData>({
         toast({
           variant: 'destructive',
           title: 'An error occurred while archiving the feature.'
+        })
+      })
+      .finally(() => setIsLoading(false))
+  }
+
+  const enable = (e: any) => {
+    e.stopPropagation()
+    setIsLoading(true)
+    FeatureRepository.enable(get(row.original, '_id'))
+      .then((resp: AxiosResponse) => {
+        if (resp.status === HttpStatusCode.Ok) {
+          toast({
+            title: 'Enable features successfully. Wait 10s for refresh'
+          })
+        }
+      })
+      .catch((e: any) => {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred while enabling the feature.'
         })
       })
       .finally(() => setIsLoading(false))
@@ -60,7 +81,9 @@ export function DataTableRowActions<TData>({
         align="end"
         className="w-[160px]"
       >
-        <DropdownMenuItem onClick={archive}>Archive</DropdownMenuItem>
+        {row.getValue('status') === FeatureStatus.ACTIVE ?
+          <DropdownMenuItem onClick={archive}>Archive</DropdownMenuItem>
+        : <DropdownMenuItem onClick={enable}>Enable</DropdownMenuItem>}
       </DropdownMenuContent>
     </DropdownMenu>
   );

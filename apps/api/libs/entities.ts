@@ -6,12 +6,13 @@ import {ApiKeyEntity} from "@repository/api-key";
 import {EnvironmentEntity} from "@repository/environment";
 import {MemberEntity} from "@repository/member";
 import {ProjectEntity} from "@repository/project";
-import {FeatureEntity, FeatureHealthEntity} from "@repository/feature";
+import {FeatureEntity, FeatureHealthEntity, FeatureStrategyEntity} from "@repository/feature";
 import {VariableEntity} from "@repository/variable";
 import { EventEntity } from '@repository/event';
 import { LastSeenAtMetricsEntity } from '@repository/last-seen-at-metrics';
 import { ClientMetricDailyEntity, ClientMetricEntity } from '@repository/client-metric';
 import {ProjectStatsEntity} from "@repository/project-stats";
+import {ApplicationEntity} from "@repository/application";
 
 export const entities = [
   UserEntity,
@@ -28,4 +29,6 @@ export const entities = [
   ClientMetricEntity,
   ClientMetricDailyEntity,
   FeatureHealthEntity,
+  ApplicationEntity,
+  FeatureStrategyEntity,
 ];
