@@ -40,10 +40,10 @@ export default function SelectProject() {
     <Dialog open={openSelectProject} onOpenChange={setOpenSelectProject}>
       <DialogHeader>
       </DialogHeader>
-      <DialogContent className={'max-w-screen-lg max-h-[90vh]'}>
+      <DialogContent className={'max-w-screen-lg max-h-[90vh] overflow-y-auto'}>
         <DialogTitle>Select Project</DialogTitle>
         {/* ===== Content ===== */}
-        <div className="flex flex-col w-full overflow-y-auto">
+        <div className="flex flex-col w-full">
           <div className="my-4 flex items-end justify-between sm:my-0 sm:items-center">
             <div className="flex flex-col gap-4 sm:my-4 sm:flex-row">
               <Input

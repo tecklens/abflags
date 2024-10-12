@@ -6,3 +6,5 @@ export const UserPlan = {
 }
 
 export const DOCS_URL = import.meta.env.VITE_DOCS_URL
+
+export const DEFAULT_PAGE_SIZE = 10

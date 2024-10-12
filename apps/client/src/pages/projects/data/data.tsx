@@ -19,15 +19,15 @@ export const labels = [
 
 export const statuses = [
   {
-    label: 'Hoạt động',
+    label: 'Active',
     value: FeatureStatus.ACTIVE,
   },
   {
-    label: 'Không Hoạt động',
+    label: 'Inactive',
     value: FeatureStatus.INACTIVE,
   },
   {
-    label: 'Lưu trữ',
+    label: 'Archive',
     value: FeatureStatus.ARCHIVE,
   },
 ]

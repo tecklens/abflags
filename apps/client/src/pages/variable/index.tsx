@@ -8,21 +8,24 @@ import { useProject } from '@client/lib/store/projectStore';
 import { useAuth } from '@client/context/auth';
 import { useEffect, useRef } from 'react';
 import { columns, DataTable } from '@client/pages/variable/components';
+import { NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { DEFAULT_PAGE_SIZE } from '@client/constant';
 
 export default function VariablePage() {
   const {token} = useAuth()
   const { variables, fetchVariables } = useProject()
-  const page = useRef<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  })
+  const [query, setQuery] = useQueryParams({
+    p: withDefault(NumberParam, 0),
+    l: withDefault(NumberParam, DEFAULT_PAGE_SIZE),
+    v: NumberParam,
+  });
 
   useEffect(() => {
     fetchVariables({
-      page: page.current.pageIndex,
-      limit: page.current.pageSize,
+      page: query.p,
+      limit: query.l,
     })
-  }, [token, page.current]);
+  }, [token, query]);
 
     return (
         <Layout>
@@ -41,12 +44,15 @@ export default function VariablePage() {
                   data={variables.data}
                   columns={columns}
                   totalCount={variables.total ?? 0}
-                  page={page.current}
+                  page={{
+                    pageIndex: query.p,
+                    pageSize: query.l
+                  }}
                   onPageChange={throttle((p: PaginationState) => {
-                    page.current = {
-                      pageSize: p.pageSize,
-                      pageIndex: p.pageIndex,
-                    }
+                    setQuery({
+                      p: p.pageIndex,
+                      l: p.pageSize,
+                    })
                   }, 300)}
                 />
               </div>

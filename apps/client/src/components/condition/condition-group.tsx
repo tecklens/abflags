@@ -1,6 +1,6 @@
 import {DragDropContext} from "react-beautiful-dnd";
 import ConditionRule from "./condition-rule";
-import {ConditionGroupState, ConditionRuleType, ConditionVariable} from "./types/variable";
+import {ConditionGroupState, ConditionRuleType, ConditionVariable} from "@abflags/shared";
 import ConditionNav from "./condition-nav";
 import {v4 as uuidv4} from 'uuid';
 import {z} from 'zod';
@@ -16,6 +16,7 @@ interface ConditionGroupProps {
   onChange: (v: ConditionGroupState) => void,
   variables: ConditionVariable[],
   isValidTree?: boolean;
+  readonly?: boolean;
 }
 
 export default function ConditionGroup({
@@ -30,6 +31,7 @@ export default function ConditionGroup({
                                          onChange,
                                          variables,
                                          isValidTree = true,
+                                         readonly,
                                        }: ConditionGroupProps) {
 
   const rulesSchema = z.array(
@@ -87,6 +89,7 @@ export default function ConditionGroup({
             }]
           })
         }}
+        readonly={readonly}
       />
       <DragDropContext onDragEnd={onDragEnd}>
         {value?.rules?.map(e => (
@@ -94,6 +97,7 @@ export default function ConditionGroup({
             isValidTree={isValidTree}
             variables={variables}
             key={e.id}
+            readonly={readonly}
             rule={e}
             onChange={(newRule) => {
               prevOnChange({

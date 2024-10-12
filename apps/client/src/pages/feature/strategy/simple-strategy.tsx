@@ -1,25 +1,13 @@
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@client/components/ui/form';
-import { Handles, Rail, Slider, Ticks, Tracks } from 'react-compound-slider';
-import {
-  KeyboardHandle,
-  SliderRail,
-  Tick,
-  Track,
-} from '@client/components/compound-slider';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { FeatureStatus } from '@abflags/shared';
-import { Input } from '@client/components/ui/input';
-import { Switch } from '@client/components/ui/switch';
-import { StrategyTargets } from '@client/pages/feature/strategy/strategy-targets';
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel,} from '@client/components/ui/form';
+import {Handles, Rail, Slider, Ticks, Tracks} from 'react-compound-slider';
+import {KeyboardHandle, SliderRail, Tick, Track,} from '@client/components/compound-slider';
+import {useForm} from 'react-hook-form';
+import {z} from 'zod';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {FeatureStatus} from '@abflags/shared';
+import {Input} from '@client/components/ui/input';
+import {Switch} from '@client/components/ui/switch';
+import {StrategyTargets} from '@client/pages/feature/strategy/strategy-targets';
 import {useAuth} from "@client/context/auth";
 import {useProject} from "@client/lib/store/projectStore";
 import React, {useEffect} from "react";
@@ -32,25 +20,37 @@ import {
   SelectTrigger,
   SelectValue
 } from "@client/components/ui/select";
+import {RepositoryFactory} from "@client/api/repository-factory";
+import {useParams} from "react-router-dom";
+import {AxiosResponse, HttpStatusCode} from "axios";
+import {useToast} from "@client/components/ui/use-toast";
+
+const FeatureRepository = RepositoryFactory.get('feature')
+
 
 const formSchema = z.object({
   name: z
     .string()
-    .min(3, { message: 'Feature Key must be at least 3 characters long' })
-    .max(64, { message: 'Feature Key max 25 characters long' }),
+    .min(3, {message: 'Feature Key must be at least 3 characters long'})
+    .max(64, {message: 'Feature Key max 25 characters long'}),
   description: z
     .string()
-    .max(128, { message: 'Description max 128 characters long' })
+    .max(128, {message: 'Description max 128 characters long'})
     .optional(),
   status: z.string(),
   percentage: z.array(z.number()).min(1),
   stickiness: z.string(),
   groupId: z.string(),
-  targets: z.array(z.any()),
+  conditions: z.array(z.any()),
 });
 
-export default function AddSimpleStrategy() {
+export default function AddSimpleStrategy({
+                                            onReload = () => {
+                                            }
+                                          }: { onReload: () => void }) {
+  const {id} = useParams();
   const {token} = useAuth()
+  const {toast} = useToast()
   const {variables, fetchVariables} = useProject()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,16 +60,29 @@ export default function AddSimpleStrategy() {
       description: '',
       status: FeatureStatus.ACTIVE,
       percentage: [100],
-      targets: [{
+      conditions: [{
         operator: 'and',
         rules: [],
         groups: [],
-      }]
+      }],
     },
   });
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data);
+    FeatureRepository.createStrategy(id, data).then((resp: AxiosResponse) => {
+      if (resp.status === HttpStatusCode.Created) {
+        toast({
+          variant: 'default',
+          title: 'Create a successful strategy.'
+        })
+        onReload()
+      }
+    }).catch((e: any) => {
+      toast({
+        variant: 'destructive',
+        title: 'An error occurred while create the strategy.'
+      })
+    })
   }
 
   useEffect(() => {
@@ -81,11 +94,15 @@ export default function AddSimpleStrategy() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={'grid gap-3 overflow-y-auto overflow-x-hidden px-3'}>
+      <form
+        id={'add-strategy-form'}
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={'grid gap-3 overflow-y-auto overflow-x-hidden px-3'}
+      >
         <FormField
           control={form.control}
           name="name"
-          render={({ field }) => (
+          render={({field}) => (
             <FormItem className="">
               <FormLabel>
                 Name <span className={'text-red-500'}>*</span>
@@ -102,7 +119,7 @@ export default function AddSimpleStrategy() {
         <FormField
           control={form.control}
           name="status"
-          render={({ field }) => (
+          render={({field}) => (
             <FormItem className="flex-1">
               <FormControl>
                 <div
@@ -126,7 +143,7 @@ export default function AddSimpleStrategy() {
         <FormField
           control={form.control}
           name="percentage"
-          render={({ field }) => (
+          render={({field}) => (
             <FormItem className="space-y-1">
               <FormLabel>
                 Percentage <span className={'text-red-500'}>*</span>
@@ -155,12 +172,12 @@ export default function AddSimpleStrategy() {
                   values={field.value}
                 >
                   <Rail>
-                    {({ getRailProps }) => (
-                      <SliderRail getRailProps={getRailProps} />
+                    {({getRailProps}) => (
+                      <SliderRail getRailProps={getRailProps}/>
                     )}
                   </Rail>
                   <Handles>
-                    {({ handles, getHandleProps }) => (
+                    {({handles, getHandleProps}) => (
                       <div className="slider-handles">
                         {handles.map((handle) => (
                           <KeyboardHandle
@@ -174,9 +191,9 @@ export default function AddSimpleStrategy() {
                     )}
                   </Handles>
                   <Tracks left={false} right={false}>
-                    {({ tracks, getTrackProps }) => (
+                    {({tracks, getTrackProps}) => (
                       <div className="slider-tracks">
-                        {tracks.map(({ id, source, target }) => (
+                        {tracks.map(({id, source, target}) => (
                           <Track
                             key={id}
                             source={source}
@@ -188,10 +205,10 @@ export default function AddSimpleStrategy() {
                     )}
                   </Tracks>
                   <Ticks count={10}>
-                    {({ ticks }) => (
+                    {({ticks}) => (
                       <div className="slider-ticks">
                         {ticks.map((tick) => (
-                          <Tick key={tick.id} tick={tick} count={1} />
+                          <Tick key={tick.id} tick={tick} count={1}/>
                         ))}
                       </div>
                     )}
@@ -205,7 +222,7 @@ export default function AddSimpleStrategy() {
           <FormField
             control={form.control}
             name="stickiness"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem className="flex-1">
                 <FormLabel>
                   Stickiness <span className={'text-red-500'}>*</span>
@@ -240,7 +257,7 @@ export default function AddSimpleStrategy() {
           <FormField
             control={form.control}
             name="groupId"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem className="flex-1">
                 <FormLabel>
                   GroupId <span className={'text-red-500'}>*</span>
@@ -252,7 +269,7 @@ export default function AddSimpleStrategy() {
             )}
           />
         </div>
-        <StrategyTargets control={form.control} register={form.register} />
+        <StrategyTargets control={form.control} register={form.register}/>
       </form>
     </Form>
   );

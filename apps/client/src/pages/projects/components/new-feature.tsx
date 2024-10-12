@@ -13,18 +13,20 @@ import {Input} from "@client/components/ui/input";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FeatureBehavior, FeatureStatus} from "@abflags/shared";
+import {FeatureBehavior, FeatureStatus, FeatureType} from "@abflags/shared";
 import {Switch} from "@client/components/ui/switch";
 import {Tag, TagInput} from "emblor";
-import {useState} from "react";
+import React, {useState} from "react";
 import {RadioGroup, RadioGroupItem} from "@client/components/ui/radio-group";
 import {Label} from "@client/components/ui/label";
 import {Button} from "@client/components/custom/button";
 import {Handles, Rail, Slider, Ticks, Tracks} from "react-compound-slider";
 import {KeyboardHandle, SliderRail, Tick, Track} from "@client/components/compound-slider";
 import {RepositoryFactory} from "@client/api/repository-factory";
-import {AxiosResponse, HttpStatusCode} from "axios";
+import axios, {AxiosResponse, HttpStatusCode} from "axios";
 import {useToast} from "@client/components/ui/use-toast";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@client/components/ui/select";
+import {FEATURE_TYPES} from "@client/pages/feature/components/feature-types";
 
 const FeatureRepository = RepositoryFactory.get('feature')
 
@@ -47,6 +49,7 @@ const formSchema = z.object({
   }),).max(4, {message: 'Max 4 tags'}).optional(),
   behavior: z.string(),
   percentage: z.array(z.number()).min(1),
+  type: z.string()
 })
 
 const LIST_BEHAVIOR = [
@@ -87,7 +90,8 @@ export default function NewFeature() {
       status: FeatureStatus.ACTIVE,
       behavior: FeatureBehavior.SIMPLE,
       tags: [],
-      percentage: [10, 20, 50, 80]
+      percentage: [10, 20, 50, 80],
+      type: FeatureType.RELEASE,
     },
   })
 
@@ -107,6 +111,14 @@ export default function NewFeature() {
         })
       }
     })
+      .catch((e: any) => {
+        if (axios.isAxiosError(e)) {
+          toast({
+            title: e.response?.data?.message,
+            variant: 'destructive'
+          })
+        }
+      })
       .finally(() => {
         setIsLoading(false)
       })
@@ -144,6 +156,39 @@ export default function NewFeature() {
                       <Input {...field} />
                     </FormControl>
                     <FormMessage/>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({field}) => (
+                  <FormItem className="">
+                    <FormLabel>
+                      Feature Type <span className={'text-red-500'}>*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className='h-8 w-full'>
+                          <SelectValue>
+                            <div className={'inline-flex items-center gap-1'}>
+                              {FEATURE_TYPES.find(e => e.id === field.value)?.icon}
+                              <span>{FEATURE_TYPES.find(e => e.id === field.value)?.label}</span>
+                            </div>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FEATURE_TYPES.map(e => (
+                            <SelectItem value={e.id} key={e.id}>
+                              <div className={'inline-flex items-center gap-1'}>
+                                {e.icon}
+                                <span>{' '}{e.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                   </FormItem>
                 )}
               />

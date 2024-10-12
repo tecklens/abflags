@@ -1,0 +1,19 @@
+{
+  "name": "js-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/js-sdk/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/js-sdk",
+        "main": "libs/js-sdk/src/index.ts",
+        "tsConfig": "libs/js-sdk/tsconfig.lib.json",
+        "assets": ["libs/js-sdk/*.md"]
+      }
+    }
+  }
+}

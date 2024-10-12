@@ -12,7 +12,7 @@ export function StrategyTargets({ control, register }: StrategyTargetsProps) {
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
     {
       control, // control props comes from useForm (optional: if you are using FormProvider)
-      name: 'targets', // unique name for your Field Array
+      name: 'conditions', // unique name for your Field Array
     },
   );
 
@@ -29,14 +29,12 @@ export function StrategyTargets({ control, register }: StrategyTargetsProps) {
         <Controller
           key={field.id}
           control={control}
-          name={`fieldArray.${index}`}
+          name={`conditions.${index}`}
           render={({ field }) => (
             <StrategyCondition value={field.value} onChange={field.onChange} />
           )}
         />
       ))}
-
-      <Button type={'button'} onClick={addTarget}>Add target</Button>
     </div>
   );
 }

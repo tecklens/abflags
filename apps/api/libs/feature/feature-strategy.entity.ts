@@ -1,21 +1,5 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import {
-  EnvironmentId,
-  FeatureBehavior,
-  FeatureId,
-  FeatureStatus, FeatureStrategyStatus,
-  FeatureType,
-  IFeature, IFeatureStrategy,
-  ProjectId,
-} from '@abflags/shared';
-import {ConditionGroupState} from "@client/components/condition/types/variable";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn,} from 'typeorm';
+import {ConditionGroupState, FeatureId, FeatureStrategyStatus, IFeatureStrategy,} from '@abflags/shared';
 
 @Entity('feature_strategy')
 export class FeatureStrategyEntity implements IFeatureStrategy {

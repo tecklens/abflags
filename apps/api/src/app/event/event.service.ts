@@ -65,4 +65,9 @@ export class EventService {
       this.logger.error(e)
     });
   }
+
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  batchDeleteEvent() {
+    return this.eventRepository.clearLog(64);
+  }
 }

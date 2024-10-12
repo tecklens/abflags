@@ -1,9 +1,7 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -11,8 +9,11 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable, PaginationState,
-} from '@tanstack/react-table'
+  PaginationState,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from '@tanstack/react-table';
 
 import {
   Table,
@@ -21,36 +22,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@client/components/ui/table'
+} from '@client/components/ui/table';
 
-import { DataTablePagination } from '../components/data-table-pagination'
-import { DataTableToolbar } from '../components/data-table-toolbar'
-import { useNavigate } from 'react-router-dom'
-import { get } from 'lodash'
+import { DataTablePagination } from '../components/data-table-pagination';
+import { DataTableToolbar } from '../components/data-table-toolbar';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  totalCount: number,
-  onPageChange: ({ pageSize, pageIndex }: PaginationState) => void
-  page: PaginationState
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  totalCount: number;
+  onPageChange: ({ pageSize, pageIndex }: PaginationState) => void;
+  page: PaginationState;
 }
 
 export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                           totalCount,
-                                           onPageChange,
+  columns,
+  data,
+  totalCount,
+  onPageChange,
   page,
-                                         }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({})
+}: DataTableProps<TData, TValue>) {
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
-
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
     data,
@@ -60,7 +58,7 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
-      pagination: page
+      pagination: page,
     },
     pageCount: Math.ceil(totalCount / 10),
     enableRowSelection: true,
@@ -75,13 +73,13 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onPaginationChange: (setPagination) => {
-      if (typeof setPagination !== 'function') return
+      if (typeof setPagination !== 'function') return;
 
-      const newPage =  setPagination(table.getState().pagination)
-      onPageChange(newPage)
+      const newPage = setPagination(table.getState().pagination);
+      onPageChange(newPage);
     },
     manualPagination: true,
-  })
+  });
 
   return (
     <div className="space-y-4">
@@ -97,11 +95,11 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -138,5 +136,5 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination table={table} />
     </div>
-  )
+  );
 }

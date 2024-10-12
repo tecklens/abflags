@@ -2,6 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnHeader } from './data-table-column-header';
 import { DataTableRowActions } from './data-table-row-actions';
 import { IVariable } from '@abflags/shared';
+import { IconCheck, IconMinus } from '@tabler/icons-react';
 
 export const columns: ColumnDef<IVariable>[] = [
   {
@@ -39,7 +40,9 @@ export const columns: ColumnDef<IVariable>[] = [
       <DataTableColumnHeader column={column} title="Required" />
     ),
     cell: ({ row }) => {
-      return <div>{row.getValue('required')}</div>;
+      return (
+        <div>{row.getValue('required') ? <IconCheck size={18} className={'text-primary'} /> : <IconMinus size={18} />}</div>
+      );
     },
   },
   {

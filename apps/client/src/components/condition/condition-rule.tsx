@@ -7,19 +7,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@client/components/ui/select';
-import React, { memo } from 'react';
-import { IconTrash } from '@tabler/icons-react';
-import { Button } from '@client/components/custom/button';
-import { Input } from '@client/components/ui/input';
-import {
-  ConditionNumberProps,
-  ConditionRuleState,
-  ConditionRuleType,
-  ConditionVariable,
-} from './types/variable';
-import { isNaN } from 'lodash';
-import { DateTimePicker } from '@client/components/ui/datetime-picker';
-import { Tag, TagInput } from 'emblor';
+import React, {memo} from 'react';
+import {IconTrash} from '@tabler/icons-react';
+import {Button} from '@client/components/custom/button';
+import {Input} from '@client/components/ui/input';
+import {ConditionRuleState, ConditionRuleType, ConditionVariable,} from '@abflags/shared';
+import {isNaN} from 'lodash';
+import {DateTimePicker} from '@client/components/ui/datetime-picker';
+import {TagInput} from 'emblor';
 
 const operators: { type: ConditionRuleType; value: string[] }[] = [
   {
@@ -60,12 +55,13 @@ interface ConditionRuleProps {
   onChange: (rule: ConditionRuleState) => void;
   variables: ConditionVariable[];
   isValidTree: boolean;
+  readonly?: boolean;
 }
 
 const ConditionRuleErrorMessage = ({
-  isValidTree,
-  rule,
-}: {
+                                     isValidTree,
+                                     rule,
+                                   }: {
   isValidTree: boolean;
   rule: ConditionRuleState;
 }) => {
@@ -85,10 +81,11 @@ interface ConditionRuleValueProps {
   onChange: (v: any) => void;
   inputProps?: ConditionVariable;
   operator?: string;
+  readonly?: boolean;
 }
 
 const ConditionRuleValue = memo(
-  ({ value, onChange, inputProps, operator }: ConditionRuleValueProps) => {
+  ({value, onChange, inputProps, operator, readonly}: ConditionRuleValueProps) => {
     const props: any = inputProps?.props;
 
     if (inputProps?.type === 'number') {
@@ -97,11 +94,13 @@ const ConditionRuleValue = memo(
           <TagInput
             maxTags={10}
             activeTagIndex={0}
-            setActiveTagIndex={() => {}}
+            setActiveTagIndex={() => {
+            }}
             placeholder="Enter a value"
             tags={value ?? []}
             className="w-full"
             size={'md'}
+            disabled={readonly}
             setTags={(newTags) => {
               onChange(newTags ?? []);
             }}
@@ -116,6 +115,7 @@ const ConditionRuleValue = memo(
             type={'number'}
             placeholder={inputProps?.props?.placeholder ?? 'Please enter value'}
             value={value}
+            disabled={readonly}
             onChange={(e) => {
               const val = e.target.valueAsNumber;
               if (!e.target.value && e.target.value !== '' && isNaN(val))
@@ -134,7 +134,7 @@ const ConditionRuleValue = memo(
     if (inputProps?.type === 'select') {
       const val = props?.options?.find((f: any) => f.value === value)?.label;
       return (
-        <Select key={value} value={value} onValueChange={onChange}>
+        <Select key={value} value={value} onValueChange={onChange} disabled={readonly}>
           <SelectTrigger value={value} className="py-0 h-7 w-fit min-w-28">
             <SelectValue placeholder="Select a value">{val}</SelectValue>
           </SelectTrigger>
@@ -155,6 +155,7 @@ const ConditionRuleValue = memo(
     if (inputProps?.type === 'date') {
       return (
         <DateTimePicker
+          disabled={readonly}
           value={value}
           onChange={onChange}
           className={'py-0 h-7 w-fit'}
@@ -168,11 +169,13 @@ const ConditionRuleValue = memo(
           <TagInput
             maxTags={10}
             activeTagIndex={0}
-            setActiveTagIndex={() => {}}
+            setActiveTagIndex={() => {
+            }}
             placeholder="Enter a value"
             tags={value ?? []}
             className="w-full"
             size={'sm'}
+            disabled={readonly}
             setTags={(newTags) => {
               onChange(newTags ?? []);
             }}
@@ -187,22 +190,24 @@ const ConditionRuleValue = memo(
             placeholder={props?.placeholder ?? 'Please enter value'}
             className={'h-7'}
             value={value}
+            disabled={readonly}
             onChange={(e) => onChange(e.target.value)}
           />
         </div>
       );
     }
 
-    return <div />;
+    return <div/>;
   },
 );
 
 export default function ConditionRule({
-  rule,
-  onChange,
-  variables,
-  isValidTree = true,
-}: ConditionRuleProps) {
+                                        rule,
+                                        onChange,
+                                        variables,
+                                        isValidTree = true,
+                                        readonly,
+                                      }: ConditionRuleProps) {
   const variable = variables.find((f) => f.id === rule?.variable);
 
   const ops = operators.find((f) => f.type === variable?.type);
@@ -266,6 +271,7 @@ export default function ConditionRule({
 
           <ConditionRuleValue
             operator={rule.operator}
+            readonly={readonly}
             inputProps={variable}
             onChange={(v) => {
               onChange({
@@ -276,11 +282,14 @@ export default function ConditionRule({
             value={rule.value}
           />
         </div>
-        <Button size={'icon'} className={'py-0 h-7 w-7'}>
-          <IconTrash color={'red'} size={15} />
-        </Button>
+        {readonly ?
+          null
+          : <Button size={'icon'} className={'py-0 h-7 w-7'}>
+            <IconTrash color={'red'} size={15}/>
+          </Button>
+        }
       </div>
-      <ConditionRuleErrorMessage rule={rule} isValidTree={isValidTree} />
+      <ConditionRuleErrorMessage rule={rule} isValidTree={isValidTree}/>
     </div>
   );
 }

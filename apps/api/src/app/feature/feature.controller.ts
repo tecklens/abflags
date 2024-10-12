@@ -1,8 +1,8 @@
-import {Body, Controller, Get, Param, Post, Put, Query, UseGuards, UseInterceptors} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseInterceptors} from '@nestjs/common';
 import {ApiHeader, ApiOperation, ApiSecurity, ApiTags} from "@nestjs/swagger";
 import {FeatureService} from "@app/feature/feature.service";
 import {UserSession} from "@abtypes/user.session";
-import {FeatureId, IJwtPayload} from "@abflags/shared";
+import {FeatureId, FeatureStrategyId, IJwtPayload} from "@abflags/shared";
 import {CreateFeatureRequestDto, CreateStrategyRequest, FeatureDto, GetFeatureRequestDto} from "@app/feature/dtos";
 import {ApiKeyAuthGuard, JwtAuthGuard} from "@app/auth/strategy";
 import {ApiResponse, ExternalApiAccessible} from "@abtypes/decorators";
@@ -74,5 +74,35 @@ export class FeatureController {
     @Param('id') id: FeatureId,
   ) {
     return this.featureService.getAllStrategy(user, id)
+  }
+
+  @Put(':id/strategy/:strategyId/disable')
+  @UseGuards(JwtAuthGuard)
+  disableStrategy(
+    @UserSession() user: IJwtPayload,
+    @Param('id') id: FeatureId,
+    @Param('strategyId') strategyId: FeatureStrategyId,
+  ) {
+    return this.featureService.disableStrategy(user, id, strategyId)
+  }
+
+  @Put(':id/strategy/:strategyId/enable')
+  @UseGuards(JwtAuthGuard)
+  enableStrategy(
+    @UserSession() user: IJwtPayload,
+    @Param('id') id: FeatureId,
+    @Param('strategyId') strategyId: FeatureStrategyId,
+  ) {
+    return this.featureService.enableStrategy(user, id, strategyId)
+  }
+
+  @Delete(':id/strategy/:strategyId')
+  @UseGuards(JwtAuthGuard)
+  deleteStrategy(
+    @UserSession() user: IJwtPayload,
+    @Param('id') id: FeatureId,
+    @Param('strategyId') strategyId: FeatureStrategyId,
+  ) {
+    return this.featureService.deleteStrategy(user, id, strategyId)
   }
 }

@@ -20,7 +20,7 @@ import {
   TabsTrigger,
 } from '../../components/ui/tabs';
 import ComingSoon from '@client/components/coming-soon';
-import FeatureOverview from './components/overview';
+import FeatureOverview from './components/feature-overview';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -130,7 +130,7 @@ export default function FeatureDetail() {
           </>
         ) : (
           <div className="w-full flex justify-center">
-            <span className="font-semibold text-gray-600">Có lỗi xảy ra</span>
+            <span className="font-semibold text-gray-600">An error occurred</span>
           </div>
         )}
       </LayoutBody>

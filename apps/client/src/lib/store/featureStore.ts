@@ -1,6 +1,6 @@
 import {create} from 'zustand'
 import {RepositoryFactory} from '@client/api/repository-factory'
-import {IFeature} from "@abflags/shared";
+import {FeatureId, IFeature, IFeatureStrategy} from "@abflags/shared";
 import {IPageResponse} from "@client/types";
 import {AxiosResponse, HttpStatusCode} from "axios";
 
@@ -11,6 +11,8 @@ export interface FeatureState {
   fetchFeature: (params: any) => void;
   openNewFeature: boolean;
   setOpenNewFeature: (v: boolean) => void;
+  strategies: IFeatureStrategy[];
+  fetchStrategies: (featureId: FeatureId) => void;
 }
 
 export const useFeature = create<FeatureState>((set) => ({
@@ -20,6 +22,7 @@ export const useFeature = create<FeatureState>((set) => ({
     total: 0,
     data: []
   },
+  strategies: [],
   openNewFeature: false,
   fetchFeature: async (params: any) => {
     FeatureRepository.all(params).then((rsp: AxiosResponse) => {
@@ -30,5 +33,20 @@ export const useFeature = create<FeatureState>((set) => ({
       }
     })
   },
-  setOpenNewFeature: (v) => set({openNewFeature: v})
+  setOpenNewFeature: (v) => set({openNewFeature: v}),
+  fetchStrategies: (featureId: FeatureId) => {
+    FeatureRepository.getAllStrategy(featureId)
+      .then((resp: AxiosResponse) => {
+        if (resp.status === HttpStatusCode.Ok) {
+          set({
+            strategies: resp.data
+          })
+        }
+      })
+      .catch(() => {
+        set({
+          strategies: []
+        })
+      })
+  },
 }))

@@ -7,33 +7,35 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@client/components/ui/sheet';
-import { Button } from '@client/components/custom/button';
+import {Button} from '@client/components/custom/button';
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from '@client/components/ui/alert';
-import { IconTerminal } from '@tabler/icons-react';
+import {IconTerminal} from '@tabler/icons-react';
 import AddSimpleStrategy from '@client/pages/feature/strategy/simple-strategy';
 
 interface AddStrategyProps {
   className?: string;
   open: boolean;
   onOpenChange: (value: boolean) => void;
+  onReload: () => void
 }
 
 export default function AddListStrategy({
-  open,
-  onOpenChange,
-  className = '',
-}: AddStrategyProps) {
+                                          open,
+                                          onOpenChange,
+                                          className = '',
+                                          onReload,
+                                        }: AddStrategyProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className={'overflow-y-auto !max-w-[100vw] lg:!max-w-[50vw]'}>
         <SheetHeader>
           <SheetTitle>Add Strategy</SheetTitle>
           <Alert>
-            <IconTerminal className="h-4 w-4" />
+            <IconTerminal className="h-4 w-4"/>
             <AlertTitle>Heads up!</AlertTitle>
             <AlertDescription>
               This feature flag is currently enabled in the development
@@ -43,12 +45,12 @@ export default function AddListStrategy({
           </Alert>
         </SheetHeader>
         <div className="grid gap-4 py-4">
-          <AddSimpleStrategy />
+          <AddSimpleStrategy onReload={onReload}/>
         </div>
         <SheetFooter>
           <SheetClose asChild>
             <div className={'inline-flex gap-3'}>
-              <Button type="submit">Save changes</Button>
+              <Button form={'add-strategy-form'} type="submit">Save changes</Button>
               <Button type="button" variant={'outline'}>
                 Cancel
               </Button>

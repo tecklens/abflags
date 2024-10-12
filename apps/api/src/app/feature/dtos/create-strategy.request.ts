@@ -1,7 +1,7 @@
 import {FeatureStatus, FeatureStrategyStatus} from "@abflags/shared";
 import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
 import {IsArray, IsDefined, IsEnum, IsOptional, IsString} from "class-validator";
-import {ConditionGroupState} from "@client/components/condition/types/variable";
+import {ConditionGroupState} from "@abflags/shared";
 
 export class CreateStrategyRequest {
   @ApiProperty()
@@ -19,7 +19,6 @@ export class CreateStrategyRequest {
   percentage: number;
 
   @ApiPropertyOptional()
-  @IsString()
   @IsOptional()
   conditions?: ConditionGroupState;
 

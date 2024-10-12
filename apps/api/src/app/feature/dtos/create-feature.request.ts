@@ -1,4 +1,4 @@
-import {FeatureStatus} from "@abflags/shared";
+import {FeatureStatus, FeatureType} from "@abflags/shared";
 import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
 import {IsArray, IsDefined, IsEnum, IsOptional, IsString} from "class-validator";
 
@@ -16,6 +16,11 @@ export class CreateFeatureRequestDto {
   @IsEnum(FeatureStatus)
   @IsDefined()
   status: FeatureStatus;
+
+  @ApiProperty()
+  @IsEnum(FeatureType)
+  @IsDefined()
+  type: FeatureType;
 
   @ApiPropertyOptional()
   @IsArray()

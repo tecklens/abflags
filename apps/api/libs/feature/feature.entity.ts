@@ -25,6 +25,7 @@ export class FeatureEntity implements IFeature {
   @Index()
   @Column({name: 'project_id', type: 'varchar', length: 64})
   _projectId: ProjectId;
+  @Index()
   @Column({name: 'name', type: 'varchar', length: 64})
   name: string;
   @Column({name: 'description', type: 'varchar', length: 128, nullable: true})

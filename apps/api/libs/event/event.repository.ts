@@ -67,4 +67,11 @@ export class EventRepository extends Repository<EventEntity> {
       createdAt: Between(range[0], range[1])
     })
   }
+
+  async clearLog(hoursAgo: number) {
+    await this.createQueryBuilder()
+      .delete()
+      .where(`created_at <= NOW() -  INTERVAL ${hoursAgo} hour`)
+      .execute()
+  }
 }

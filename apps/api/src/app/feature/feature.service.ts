@@ -1,10 +1,13 @@
 import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
 import {FeatureEntity, FeatureRepository, FeatureStrategyRepository} from "@repository/feature";
 import {
-  FEATURE_ARCHIVED, FEATURE_CREATED, FEATURE_ENABLE,
-  FEATURE_TYPE_UPDATED,
+  FEATURE_ARCHIVED,
+  FEATURE_CREATED,
+  FEATURE_ENABLE,
   FeatureId,
   FeatureStatus,
+  FeatureStrategyId,
+  FeatureStrategyStatus,
   IBaseEvent,
   IJwtPayload,
   IPaginatedResponseDto
@@ -54,6 +57,7 @@ export class FeatureService {
       name: payload.name,
       description: payload.description,
       status: payload.status,
+      type: payload.type,
       tags: payload.tags,
     })
 
@@ -162,5 +166,44 @@ export class FeatureService {
     return this.featureStrategyRepository.findBy({
       featureId: id,
     })
+  }
+
+  async disableStrategy(u: IJwtPayload, id: FeatureId, strategyId: FeatureStrategyId) {
+    const strategy = await this.featureStrategyRepository.findOneBy({
+      featureId: id,
+      _id: strategyId
+    })
+
+    if (!strategy) throw new NotFoundException();
+
+    return this.featureStrategyRepository.save({
+      ...strategy,
+      status: FeatureStrategyStatus.INACTIVE
+    })
+  }
+
+  async enableStrategy(u: IJwtPayload, id: FeatureId, strategyId: FeatureStrategyId) {
+    const strategy = await this.featureStrategyRepository.findOneBy({
+      featureId: id,
+      _id: strategyId
+    })
+
+    if (!strategy) throw new NotFoundException();
+
+    return this.featureStrategyRepository.save({
+      ...strategy,
+      status: FeatureStrategyStatus.ACTIVE
+    })
+  }
+
+  async deleteStrategy(u: IJwtPayload, id: FeatureId, strategyId: FeatureStrategyId) {
+    const strategy = await this.featureStrategyRepository.findOneBy({
+      featureId: id,
+      _id: strategyId
+    })
+
+    if (!strategy) throw new NotFoundException();
+
+    return this.featureStrategyRepository.remove(strategy)
   }
 }

@@ -1,4 +1,4 @@
-import { FeatureId } from '@abflags/shared'
+import {FeatureId, FeatureStrategyId} from '@abflags/shared'
 import BaseRepository from '@client/api/base-repository'
 
 const resource = '/feature'
@@ -24,5 +24,14 @@ export default {
   },
   getAllStrategy(id: FeatureId) {
     return BaseRepository.get(`${resource}/${id}/strategy`)
-  }
+  },
+  enableStrategy(id: FeatureId, strategyId: FeatureStrategyId) {
+    return BaseRepository.put(`${resource}/${id}/strategy/${strategyId}/enable`)
+  },
+  disableStrategy(id: FeatureId, strategyId: FeatureStrategyId) {
+    return BaseRepository.put(`${resource}/${id}/strategy/${strategyId}/disable`)
+  },
+  deleteStrategy(id: FeatureId, strategyId: FeatureStrategyId) {
+    return BaseRepository.delete(`${resource}/${id}/strategy/${strategyId}`)
+  },
 }
