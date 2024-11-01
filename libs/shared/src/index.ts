@@ -5,3 +5,4 @@ export * from './lib/exceptions';
 export * from './lib/services';
 export * from './lib/utils';
 export * from './lib/dto';
+export * from './lib/logic';

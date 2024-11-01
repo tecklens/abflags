@@ -104,15 +104,28 @@ export default function ConditionGroup({
                 ...value,
                 rules: value?.rules?.map(f => f.id === e.id ? newRule : f)
               })
-            }}/>
+            }}
+            onRemove={() => {
+              prevOnChange({
+                ...value,
+                rules: value?.rules?.filter(f => f.id !== e.id)
+              })
+            }}
+          />
         ))}
         {value?.groups?.map((e, idx) => (
-          <ConditionGroup variables={variables} value={e} onChange={(v) => {
-            prevOnChange({
-              ...value,
-              groups: value?.groups ? value.groups.map(e => e.id === v.id ? v : e) : []
-            })
-          }} key={idx}/>
+          <ConditionGroup
+            variables={variables}
+            value={e}
+            onChange={(v) => {
+              prevOnChange({
+                ...value,
+                groups: value?.groups ? value.groups.map(e => e.id === v.id ? v : e) : []
+              })
+            }}
+            key={idx}
+            readonly={readonly}
+          />
         ))}
       </DragDropContext>
     </div>

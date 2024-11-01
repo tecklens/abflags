@@ -118,7 +118,7 @@ export default function FeatureDetail() {
                 <FeatureOverview feature={feature}/>
               </TabsContent>
               <TabsContent value="metric">
-                <FeatureMetric/>
+                <FeatureMetric feature={feature}/>
               </TabsContent>
               <TabsContent value="setting">
                 <FeatureSetting feature={feature}/>

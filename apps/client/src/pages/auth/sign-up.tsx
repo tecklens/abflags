@@ -17,7 +17,7 @@ export default function SignUp() {
               height={28}
               alt="Logo"
             />
-            <h1 className="text-xl font-medium">Tecklens Wolf</h1>
+            <h1 className="text-xl font-medium">Abflags</h1>
           </div>
           <Card className="p-6">
             <div className='mb-2 flex flex-col space-y-2 text-left'>

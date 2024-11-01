@@ -89,7 +89,7 @@ export default function Nav({
     >
       <TooltipProvider delayDuration={0}>
         <nav className="h-full group-[[data-collapsed=true]]:h-full gap-1 flex flex-col group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
-          <div className={'p-3'}>
+          <div className={`p-3 ${isCollapsed ? 'hidden' : ''}`}>
             {activeProject ? (
               <Button
                 variant={'outline'}

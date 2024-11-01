@@ -91,4 +91,18 @@ export class FeatureRepository extends Repository<FeatureEntity> {
       name: name
     })
   }
+
+  async getAllFeatureByProjectId(
+    envId: EnvironmentId,
+    projId: ProjectId,
+  ) {
+    return this.find({
+      where: {
+        _environmentId: envId,
+        _projectId: projId,
+        status: FeatureStatus.ACTIVE,
+      },
+      relations: ['strategies']
+    })
+  }
 }

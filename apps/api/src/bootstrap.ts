@@ -17,7 +17,7 @@ const corsOptionsDelegate = function (req, callback) {
     origin: false as boolean | string | string[],
     preflightContinue: false,
     maxAge: 86400,
-    allowedHeaders: ['Content-Type', 'Authorization', 'sentry-trace'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'sentry-trace', 'api_key'],
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   };
 
@@ -115,5 +115,5 @@ export default async function bootstrap() {
 }
 
 function isBlueprintRoute(url: string) {
-  return url.startsWith('/v1/blueprints');
+  return url.startsWith('/v1/blueprints') || url.includes('frontend') || url.includes('metric');
 }

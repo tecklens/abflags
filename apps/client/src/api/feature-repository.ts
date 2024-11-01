@@ -22,8 +22,14 @@ export default {
   createStrategy(id: FeatureId, payload: any) {
     return BaseRepository.post(`${resource}/${id}/strategy`, payload)
   },
+  uploadStrategy(id: FeatureId, payload: any) {
+    return BaseRepository.put(`${resource}/${id}/strategy`, payload)
+  },
   getAllStrategy(id: FeatureId) {
     return BaseRepository.get(`${resource}/${id}/strategy`)
+  },
+  updateOrderStrategy(featureId: FeatureId, data: any) {
+    return BaseRepository.put(`${resource}/${featureId}/strategy/order`, data)
   },
   enableStrategy(id: FeatureId, strategyId: FeatureStrategyId) {
     return BaseRepository.put(`${resource}/${id}/strategy/${strategyId}/enable`)

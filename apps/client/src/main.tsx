@@ -10,14 +10,12 @@ import AuthProvider from '@client/context/auth'
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <TooltipProvider>
-        <AuthProvider>
-          <RouterProvider router={router} />
-        </AuthProvider>
-      </TooltipProvider>
-      <Toaster />
-    </ThemeProvider>
-  </React.StrictMode>,
+  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <TooltipProvider>
+      <AuthProvider>
+        <RouterProvider router={router}/>
+      </AuthProvider>
+    </TooltipProvider>
+    <Toaster/>
+  </ThemeProvider>,
 )

@@ -3,7 +3,7 @@ import { get } from 'lodash'
 import UserRepository from '@client/api/user-repository'
 import EnvironmentRepository from '@client/api/environment-repository'
 import ProjectRepository from '@client/api/project-repository'
-import AnalysisRepository from '@client/api/analysis-repository'
+import MetricRepository from '@client/api/metric-repository'
 import NotificationRepository from '@client/api/notification-repository'
 import FileRepository from '@client/api/file-repository'
 import FeatureRepository from "@client/api/feature-repository";
@@ -15,7 +15,7 @@ const repositories = {
   user: UserRepository,
   env: EnvironmentRepository,
   project: ProjectRepository,
-  anal: AnalysisRepository,
+  metric: MetricRepository,
   noti: NotificationRepository,
   file: FileRepository,
   feature: FeatureRepository,
@@ -24,7 +24,7 @@ const repositories = {
 }
 
 export const RepositoryFactory: {
-  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'anal' | 'file' | 'event' | 'app') => any
+  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'metric' | 'file' | 'event' | 'app') => any
 } = {
-  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'anal' | 'file' | 'event' | 'app') => get(repositories, name)
+  get: (name: 'auth' | 'user' | 'env' | 'project' | 'feature' | 'metric' | 'file' | 'event' | 'app') => get(repositories, name)
 }

@@ -108,6 +108,7 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
   return (
     <button
       role="slider"
+      type={'button'}
       aria-valuemin={min}
       aria-valuemax={max}
       aria-valuenow={value}

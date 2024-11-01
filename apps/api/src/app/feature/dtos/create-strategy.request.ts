@@ -8,11 +8,19 @@ export class CreateStrategyRequest {
   @IsString()
   @IsDefined()
   name: string;
+  @ApiProperty()
+  @IsString()
+  @IsDefined()
+  stickiness: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   description: string;
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  groupId: string;
 
   @ApiProperty()
   @IsDefined()
@@ -20,7 +28,7 @@ export class CreateStrategyRequest {
 
   @ApiPropertyOptional()
   @IsOptional()
-  conditions?: ConditionGroupState;
+  conditions?: ConditionGroupState[];
 
   @ApiProperty()
   @IsEnum(FeatureStrategyStatus)

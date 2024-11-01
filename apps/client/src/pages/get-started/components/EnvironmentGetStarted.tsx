@@ -50,16 +50,6 @@ export default function EnvironmentGetStarted() {
           document.getElementById('trigger-sidebar-tour')?.click()
         }}>View environment switch</Button>
       </div>
-      <div className={'font-semibold text-base'}>2. Organizations</div>
-      <div className={'max-w-screen-md'}>
-        Your organization is automatically created upon registration. Alternatively, you can join a team via an email
-        invitation or a link sent by the owner of those organizations.
-      </div>
-      <div>
-        <Button onClick={() => {
-          document.getElementById('trigger-sidebar-tour')?.click()
-        }}>View organizations switch</Button>
-      </div>
       <div className={'bg-[#F7F7F8] dark:bg-[#27272a] rounded-lg p-3 lg:p-5'}>
         <div className={'w-full flex justify-between space-x-3'}>
           <div className={'flex flex-col'}>

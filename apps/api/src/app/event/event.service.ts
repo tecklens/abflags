@@ -57,7 +57,7 @@ export class EventService {
     ]
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   batchInsertEvent() {
     const copy = [...this.unSavedEvents]
     this.unSavedEvents = []

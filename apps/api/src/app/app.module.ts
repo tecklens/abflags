@@ -60,7 +60,7 @@ import { ApplicationModule } from './application/application.module';
         synchronize: true,
         keepAlive: 3e4,
         connectTimeoutMS: 3e4,
-        logging: ['error', 'query'],
+        logging: ['error'],
       }),
       async dataSourceFactory(options) {
         if (!options) {

@@ -9,7 +9,7 @@ import {columns, DataTable} from "./components";
 
 export default function Features() {
   const {token} = useAuth()
-  const {features, fetchFeature, setOpenNewFeature} = useFeature()
+  const {id, features, fetchFeature, setOpenNewFeature} = useFeature()
   const page = useRef<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -31,7 +31,7 @@ export default function Features() {
 
       return () => intervalId && clearInterval(intervalId)
     }
-  }, [token])
+  }, [token, id])
   return (
     <>
       <div className={'p-3 shadow-lg dark:border rounded-lg'}>

@@ -73,3 +73,15 @@ function nFormatter(num: number, digits: number) {
   const item = findLast(lookup, item => num >= item.value);
   return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
 }
+
+export function reorder<TItem>(
+  list: TItem[],
+  startIndex: number,
+  endIndex: number,
+): TItem[] {
+  const result = [...list];
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+}

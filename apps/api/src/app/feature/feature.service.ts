@@ -1,6 +1,7 @@
 import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
 import {FeatureEntity, FeatureRepository, FeatureStrategyRepository} from "@repository/feature";
 import {
+  ConditionGroupState,
   FEATURE_ARCHIVED,
   FEATURE_CREATED,
   FEATURE_ENABLE,
@@ -9,13 +10,24 @@ import {
   FeatureStrategyId,
   FeatureStrategyStatus,
   IBaseEvent,
+  IFeatureStrategy,
   IJwtPayload,
-  IPaginatedResponseDto
+  IPaginatedResponseDto,
+  Operator
 } from "@abflags/shared";
-import {CreateFeatureRequestDto, CreateStrategyRequest, FeatureDto, GetFeatureRequestDto} from "@app/feature/dtos";
+import {
+  CreateFeatureRequestDto,
+  CreateStrategyRequest,
+  FeatureDto,
+  FrontendFeatureRequest,
+  GetFeatureRequestDto,
+  UpdateStrategyRequest
+} from "@app/feature/dtos";
 import {Transactional} from "typeorm-transactional";
 import {InjectQueue} from "@nestjs/bullmq";
 import {Queue} from "bullmq";
+import {get, reduce} from "lodash";
+import {normalizedStrategyValue} from "@client/utils/normalize";
 
 @Injectable()
 export class FeatureService {
@@ -150,6 +162,7 @@ export class FeatureService {
   }
 
   async createStrategy(u: IJwtPayload, id: FeatureId, payload: CreateStrategyRequest) {
+    const numCurrentOfStrategy = await this.featureStrategyRepository.countCurrentStrategy(id)
     return this.featureStrategyRepository.save({
       featureId: id,
       conditions: payload.conditions,
@@ -159,13 +172,44 @@ export class FeatureService {
       status: payload.status,
       createdBy: u._id,
       updatedBy: u._id,
+      percentage: payload.percentage,
+      stickiness: payload.stickiness,
+      groupId: payload.groupId,
+      order: numCurrentOfStrategy + 1,
+    })
+  }
+
+  async updateStrategy(u: IJwtPayload, id: FeatureId, payload: UpdateStrategyRequest) {
+    return this.featureStrategyRepository.update({
+      featureId: id,
+      _id: payload.id,
+    }, {
+      conditions: payload.conditions,
+      name: payload.name,
+      sortOrder: payload.sortOrder,
+      description: payload.description,
+      status: payload.status,
+      updatedBy: u._id,
+      percentage: payload.percentage,
+      stickiness: payload.stickiness,
+      groupId: payload.groupId,
     })
   }
 
   async getAllStrategy(u: IJwtPayload, id: FeatureId) {
-    return this.featureStrategyRepository.findBy({
-      featureId: id,
+    return this.featureStrategyRepository.find({
+      where: {
+        featureId: id,
+      },
+      order: {
+        order: 'ASC',
+        createdAt: 'DESC'
+      }
     })
+  }
+
+  async updateOrderStrategy(u: IJwtPayload, strategies: IFeatureStrategy[]) {
+    return this.featureStrategyRepository.save(strategies.map((e, index) => ({...e, order: index,})))
   }
 
   async disableStrategy(u: IJwtPayload, id: FeatureId, strategyId: FeatureStrategyId) {
@@ -205,5 +249,125 @@ export class FeatureService {
     if (!strategy) throw new NotFoundException();
 
     return this.featureStrategyRepository.remove(strategy)
+  }
+
+  async getFrontendFeature(u: IJwtPayload, context: FrontendFeatureRequest): Promise<FeatureDto[]> {
+    const features = await this.featureRepository.getAllFeatureByProjectId(
+      u.environmentId,
+      u.projectId
+    );
+
+    let finalFeature: FeatureEntity[] = [];
+    for (let feature of features) {
+      let finalEnabled = false;
+
+      if (feature.strategies && feature.strategies.length > 0) {
+        for (let strategy of feature.strategies) {
+          if (strategy.status !== FeatureStrategyStatus.ACTIVE) continue;
+          // * check gradual rollout
+          // * if stickiness not exist in context
+          const valueStickiness = get(context, strategy.stickiness)
+          if (!valueStickiness) {
+            continue;
+          }
+
+          const percentage = Number(strategy.percentage);
+          const groupId = strategy.groupId || '';
+
+          const normalizedUserId = normalizedStrategyValue(valueStickiness, groupId);
+
+          // * check percentage rollout
+          let isEnabled = percentage > 0 && normalizedUserId <= percentage;
+
+          if (!isEnabled) continue;
+
+          isEnabled = reduce(strategy.conditions, (rlt, e) => {
+            return rlt && this.checkConditional(context, e)
+          }, isEnabled)
+          if (isEnabled) {
+            finalEnabled = true
+            break;
+          }
+        }
+      } else {
+        finalEnabled = true;
+      }
+
+      if (finalEnabled) {
+        finalFeature = [...finalFeature, feature];
+      }
+    }
+
+    return finalFeature.map(e => ({
+      name: e.name,
+      _id: e._id,
+      behavior: e.behavior,
+      status: e.status,
+      tags: e.tags,
+      _projectId: e._projectId,
+      type: e.type
+    }));
+  }
+
+  private checkConditional(values: any, conditions: ConditionGroupState) {
+    const operators = {
+      [Operator.IS_EQUAL_TO]: function (a, b) {
+        return a == b;
+      },
+      [Operator.MORE_THAN]: function (a, b) {
+        return a > b;
+      },
+      [Operator.LESS_THAN]: function (a, b) {
+        return a < b;
+      },
+      [Operator.MORE_THAN_EQUAL]: function (a, b) {
+        return a >= b;
+      },
+      [Operator.LESS_THAN_EQUAL]: function (a, b) {
+        return a <= b;
+      },
+      [Operator.IS_NOT_EQUAL_TO]: function (a, b) {
+        return a != b;
+      },
+      [Operator.IN]: function (a, b) {
+        return Array.isArray(b) ? b.find((f) => f.text == a) : false;
+      },
+      [Operator.NOT_IN]: function (a, b) {
+        return Array.isArray(b) ? !b.find((f) => f.text == a) : false;
+      },
+    };
+    if (conditions?.rules) {
+      let rlt = conditions.operator === 'and';
+      for (const rule of conditions.rules) {
+        const variable = rule.variable;
+        const operator = rule.operator;
+        const value = rule.value;
+
+        const targetValue = get(values, variable);
+
+        if (!targetValue) return false;
+
+        const executor = get(operators, operator);
+        if (typeof executor === 'function') {
+          const c = executor(targetValue, value);
+
+          if (conditions.operator === 'and') rlt = rlt && c;
+          else rlt = rlt || c;
+        }
+      }
+
+      if (conditions.groups && conditions.groups.length > 0) {
+        const groupRlt = conditions.groups.reduce((rlt, e) => {
+          const c1 = this.checkConditional(values, e);
+          if (conditions.operator === 'and') return rlt && c1;
+          else return rlt || c1;
+        }, conditions.operator === 'and');
+
+        if (conditions.operator === 'and') rlt = rlt && groupRlt;
+        else rlt = rlt || groupRlt;
+      }
+
+      return rlt;
+    }
   }
 }

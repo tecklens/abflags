@@ -6,6 +6,8 @@ export interface IFeatureStrategy {
   description?: string;
   status: FeatureStrategyStatus;
   featureId: FeatureId;
+  stickiness: string;
+  groupId: string;
 
   percentage: number;
 
@@ -17,4 +19,5 @@ export interface IFeatureStrategy {
   updatedAt: Date;
   createdBy: string;
   updatedBy: string;
+  order?: number;
 }

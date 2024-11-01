@@ -1,10 +1,11 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { MetricService } from '@app/metric/metric.service';
-import { ApiKeyAuthGuard } from '@app/auth/strategy';
-import { UserSession } from '@abtypes/user.session';
-import { IJwtPayload } from '@abflags/shared';
-import { ClientMetricDto } from '@app/metric/dtos/client-metric.dto';
+import {Body, Controller, Get, Post, Query, UseGuards} from '@nestjs/common';
+import {ApiBearerAuth, ApiOperation, ApiSecurity, ApiTags} from '@nestjs/swagger';
+import {MetricService} from '@app/metric/metric.service';
+import {ApiKeyAuthGuard, JwtAuthGuard} from '@app/auth/strategy';
+import {UserSession} from '@abtypes/user.session';
+import {IJwtPayload} from '@abflags/shared';
+import {ExternalApiAccessible} from "@abtypes/decorators";
+import {AnalysisMetricDto, ClientBucketMetricDto} from "@app/metric/dtos";
 
 @Controller('metric')
 @ApiTags('Metric')
@@ -13,7 +14,24 @@ export class MetricController {
 
   @Post('')
   @UseGuards(ApiKeyAuthGuard)
-  addMetrics(@UserSession() user: IJwtPayload, @Body() payload: ClientMetricDto[]) {
+  @ApiSecurity('api_key')
+  @ApiOperation({
+    summary: 'API receive metric from sdk',
+  })
+  @ExternalApiAccessible()
+  addMetrics(@UserSession() user: IJwtPayload, @Body() payload: ClientBucketMetricDto) {
     return this.metricService.registerBulkMetrics(user, payload)
+  }
+
+  @Get('anal')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'API analysis metric of client sdk',
+  })
+  analysisMetric(
+    @UserSession() user: IJwtPayload, @Query() payload: AnalysisMetricDto
+  ) {
+    return this.metricService.analysisMetrics(user, payload);
   }
 }

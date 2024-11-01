@@ -64,7 +64,7 @@ export default function ChartRadialLabel() {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square max-h-[350px]"
         >
           <RadialBarChart
             data={chartData}
@@ -72,6 +72,7 @@ export default function ChartRadialLabel() {
             endAngle={380}
             innerRadius={30}
             outerRadius={110}
+            barGap={10}
           >
             <ChartTooltip
               cursor={false}
@@ -82,7 +83,7 @@ export default function ChartRadialLabel() {
                 position="insideStart"
                 dataKey="browser"
                 className="fill-white capitalize mix-blend-luminosity"
-                fontSize={11}
+                fontSize={10}
               />
             </RadialBar>
           </RadialBarChart>

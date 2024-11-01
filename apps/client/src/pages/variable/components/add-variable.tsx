@@ -37,7 +37,7 @@ import { NumberParam, useQueryParam, useQueryParams } from 'use-query-params';
 
 const ProjectRepository = RepositoryFactory.get('project');
 
-const varTypes = ['string', 'number', 'boolean', 'date'];
+const varTypes = ['string', 'number', 'date'];
 
 const formSchema = z.object({
   name: z

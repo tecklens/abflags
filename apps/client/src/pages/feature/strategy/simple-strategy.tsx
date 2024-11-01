@@ -46,8 +46,10 @@ const formSchema = z.object({
 
 export default function AddSimpleStrategy({
                                             onReload = () => {
-                                            }
-                                          }: { onReload: () => void }) {
+                                            },
+                                            data,
+                                          }: { onReload: () => void, data?: any }) {
+  console.log(data)
   const {id} = useParams();
   const {token} = useAuth()
   const {toast} = useToast()
@@ -68,21 +70,47 @@ export default function AddSimpleStrategy({
     },
   });
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
-    FeatureRepository.createStrategy(id, data).then((resp: AxiosResponse) => {
-      if (resp.status === HttpStatusCode.Created) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (data && data._id) {
+      // * update strategy
+      FeatureRepository.uploadStrategy(id, {
+        id: data._id,
+        ...values,
+        percentage: values.percentage[0],
+      }).then((resp: AxiosResponse) => {
+        if (resp.status === HttpStatusCode.Ok) {
+          toast({
+            variant: 'default',
+            title: 'Update a successful strategy.'
+          })
+          onReload()
+        }
+      }).catch((e: any) => {
         toast({
-          variant: 'default',
-          title: 'Create a successful strategy.'
+          variant: 'destructive',
+          title: 'An error occurred while update the strategy.'
         })
-        onReload()
-      }
-    }).catch((e: any) => {
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred while create the strategy.'
       })
-    })
+    } else {
+      // * create strategy
+      FeatureRepository.createStrategy(id, {
+        ...values,
+        percentage: values.percentage[0],
+      }).then((resp: AxiosResponse) => {
+        if (resp.status === HttpStatusCode.Created) {
+          toast({
+            variant: 'default',
+            title: 'Create a successful strategy.'
+          })
+          onReload()
+        }
+      }).catch((e: any) => {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred while create the strategy.'
+        })
+      })
+    }
   }
 
   useEffect(() => {
@@ -91,6 +119,13 @@ export default function AddSimpleStrategy({
       limit: 50
     })
   }, [token])
+
+  useEffect(() => {
+    if (data) form.reset({
+      ...data,
+      percentage: data.percentage ? [data.percentage] : [100]
+    })
+  }, [data])
 
   return (
     <Form {...form}>
@@ -152,10 +187,10 @@ export default function AddSimpleStrategy({
                 The number of feature variations will have to be fully
                 configured on the website side, otherwise it will be hidden
               </FormDescription>
-              <FormDescription>
-                Variations will be scaled according to the <b>round-robin</b>{' '}
-                algorithm
-              </FormDescription>
+              {/*<FormDescription>*/}
+              {/*  Variations will be scaled according to the <b>round-robin</b>{' '}*/}
+              {/*  algorithm*/}
+              {/*</FormDescription>*/}
               <FormControl>
                 <Slider
                   vertical={false}
@@ -236,14 +271,14 @@ export default function AddSimpleStrategy({
                   >
                     <SelectTrigger className="py-0">
                       <SelectValue placeholder="Select a variable">
-                        {variables?.data?.find(e => e._id === field.value)?.name}
+                        {variables?.data?.find(e => e.name === field.value)?.name}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Select one variable</SelectLabel>
                         {variables?.data?.map((e) => (
-                          <SelectItem key={e._id} value={e._id}>
+                          <SelectItem key={e._id} value={e.name}>
                             {e.name}
                           </SelectItem>
                         ))}

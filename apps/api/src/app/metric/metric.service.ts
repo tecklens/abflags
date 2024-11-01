@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { IClientMetricsEnv, IJwtPayload } from '@abflags/shared';
-import { ClientMetricRepository } from '@repository/client-metric';
-import { LastSeenAtMetricService } from '@app/metric/last-seen-at-metric.service';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { ClientMetricDto } from '@app/metric/dtos/client-metric.dto';
+import {Injectable, Logger} from '@nestjs/common';
+import {FeatureId, IClientMetricsEnv, IJwtPayload} from '@abflags/shared';
+import {ClientMetricRepository} from '@repository/client-metric';
+import {LastSeenAtMetricService} from '@app/metric/last-seen-at-metric.service';
+import {Cron, CronExpression} from '@nestjs/schedule';
+import {AnalysisMetricDto, ClientBucketMetricDto} from "@app/metric/dtos";
 
 @Injectable()
 export class MetricService {
@@ -13,31 +13,35 @@ export class MetricService {
   constructor(
     private readonly clientMetricRepository: ClientMetricRepository,
     private readonly lastSeenAtMetricService: LastSeenAtMetricService,
-  ) {}
+  ) {
+  }
 
   async registerBulkMetrics(
     u: IJwtPayload,
-    metrics: ClientMetricDto[],
+    metrics: ClientBucketMetricDto,
   ): Promise<void> {
-    const transformMetrics = metrics.map((e) => ({
-      appName: e.appName,
-      featureId: e.featureId,
-      yes: e.yes,
-      no: e.no,
+    if (!metrics || !metrics.bucket) return;
+    const transformMetrics = Object.entries(metrics.bucket.features).map((e) => ({
+      appName: metrics.appName,
+      featureName: e[0],
+      yes: e[1].yes,
+      no: e[1].no,
       environmentId: u.environmentId,
-      createdAt: e.createdAt,
+      start: metrics.bucket.start,
+      end: metrics.bucket.end,
+      createdAt: metrics.createdAt,
     }));
     this.unsavedMetrics = [...this.unsavedMetrics, ...transformMetrics];
     this.lastSeenAtMetricService.updateLastSeen(transformMetrics);
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  bulkAdd() {
-    this.logger.debug('Scan client metric with second is 10');
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async bulkAdd() {
+    this.logger.debug('Scan client metric with second is 30');
     if (this.unsavedMetrics.length > 0) {
       const copy = [...this.unsavedMetrics];
       this.unsavedMetrics = [];
-      this.batchInsertMetrics(copy);
+      await this.batchInsertMetrics(copy);
       // this.config.eventBus.emit(CLIENT_METRICS_ADDED, copy);
     }
   }
@@ -77,5 +81,13 @@ export class MetricService {
   @Cron(CronExpression.EVERY_30_SECONDS)
   async clearMetrics() {
     return this.clientMetricRepository.clearMetrics(48);
+  }
+
+  async analysisMetrics(u: IJwtPayload, payload: AnalysisMetricDto) {
+    return this.clientMetricRepository.analysisMetricsByFeatureId({
+      featureName: payload.featureName,
+      limit: 48,
+      period: payload.period,
+    });
   }
 }

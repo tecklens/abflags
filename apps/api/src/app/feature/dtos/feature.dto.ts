@@ -1,4 +1,4 @@
-import {FeatureBehavior, FeatureStatus} from "@abflags/shared";
+import {FeatureBehavior, FeatureStatus, FeatureType} from "@abflags/shared";
 
 export class FeatureDto {
   _id: string;
@@ -6,4 +6,10 @@ export class FeatureDto {
 
   status: FeatureStatus;
   behavior: FeatureBehavior;
+
+  tags?: string[];
+
+  _projectId?: string;
+
+  type?: FeatureType;
 }

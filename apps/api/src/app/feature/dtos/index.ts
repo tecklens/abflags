@@ -1,4 +1,6 @@
 export * from './get-feature.request'
 export * from './create-feature.request'
+export * from './update-strategy.request'
 export * from './feature.dto'
 export * from './create-strategy.request'
+export * from './frontend-feature.request'

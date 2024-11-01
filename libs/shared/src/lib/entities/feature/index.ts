@@ -1,5 +1,8 @@
+import {IFeatureStrategy} from "./feature-strategy";
+
 export * from './feature-health.interface'
 export * from './feature-strategy'
+export * from './feature-variant'
 import {EnvironmentId, FeatureBehavior, FeatureId, FeatureStatus, FeatureType, ProjectId} from "../../types";
 
 export interface IFeature {
@@ -20,4 +23,6 @@ export interface IFeature {
   createdBy: string;
   updatedBy: string;
   archivedAt?: Date;
+
+  strategies?: IFeatureStrategy[];
 }

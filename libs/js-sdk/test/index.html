@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>js-sdk manual test</title>
+  <script src="../build/index.umd.js" type="text/javascript"></script>
+  <script type="module">
+    const client = new ab.AbClient({
+      url: 'http://localhost:3232',
+      clientKey: '341f4ac0a2aeffc4b6ac2f6c89a92143',
+      appName: 'test',
+      userId: '1',
+      refreshInterval: 5000,
+      metricsInterval: 5000,
+      disableMetrics: false,
+    });
+
+    client.start();
+    client.on('initialized', () => console.log('initialized'));
+    client.on('error', (error) => console.log('error', error));
+    client.on('ready', () => {
+    });
+    client.on('impression', () => console.log('impression'));
+    client.on('update', () => {
+        console.log('update', client.isEnabled('fsdsdsdsdsd'))
+        if (client.isEnabled('fsdsdsdsdsd')) {
+          document.getElementById("test-a").style.display = 'flex';
+          document.getElementById("test-b").style.display = 'none';
+        } else {
+          document.getElementById("test-a").style.display = 'none';
+          document.getElementById("test-b").style.display = 'flex';
+        }
+
+      client.isEnabled('sdsdsdsdsd')
+      }
+    );
+
+  </script>
+</head>
+<body>
+<div id="test-a" style="height: 300px; width: 300px; display: flex; align-items: center; justify-content: center; background-color: red;color: white">
+  <span>Test for A testing</span>
+</div>
+<div id="test-b" style="height: 300px; width: 300px; display: none; align-items: center; justify-content: center; background-color: green;color: white">
+  <span>Test for B testing</span>
+</div>
+</body>
+</html>

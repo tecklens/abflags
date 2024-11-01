@@ -100,7 +100,7 @@ const planFeatures: PlanFeature[] = [
         enterprise: true,
       },
       {
-        name: "Edit Wolfx Branding",
+        name: "Edit A/B flags Branding",
         free: false,
         startup: true,
         team: true,

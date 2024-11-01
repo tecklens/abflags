@@ -21,7 +21,7 @@ export default function SignIn2() {
               height={28}
               alt="Logo"
             />
-            <h1 className="text-xl font-medium">Wolf Notification</h1>
+            <h1 className="text-xl font-medium">A/B Flags</h1>
           </div>
           <Card className="p-6">
             <div className="flex flex-col space-y-2 text-left">

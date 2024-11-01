@@ -2,7 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
+  Index, OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -15,6 +15,7 @@ import {
   IFeature,
   ProjectId,
 } from '@abflags/shared';
+import {FeatureStrategyEntity} from "@repository/feature/feature-strategy.entity";
 
 @Entity('feature')
 export class FeatureEntity implements IFeature {
@@ -66,4 +67,7 @@ export class FeatureEntity implements IFeature {
   updatedAt: Date;
   @Column({name: 'updated_by', nullable: true, length: 64})
   updatedBy: string;
+
+  @OneToMany(type => FeatureStrategyEntity, f => f.feature)
+  strategies: FeatureStrategyEntity[];
 }

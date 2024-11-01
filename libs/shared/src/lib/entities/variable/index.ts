@@ -1,7 +1,7 @@
 export * from './variable-default'
 import { ProjectId } from '../../types';
 
-export type VariableType = 'string' | 'number' | 'text' | 'email' | 'password' | 'select' | 'date';
+export type VariableType = 'number' | 'select' | 'string' | 'date';
 
 export interface IVariable {
   _id: string;

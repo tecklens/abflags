@@ -11,7 +11,7 @@ export class LastSeenAtMetricService {
   constructor(private readonly lastSeenAtMetricRepository: LastSeenAtMetricsRepository) {
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
     this.logger.debug('Scan last seen at metric with second is 10');
 
@@ -46,16 +46,16 @@ export class LastSeenAtMetricService {
       .filter(
         (clientMetric) =>
           !this.lastSeenToggles.has(
-            `${clientMetric.featureId}:${clientMetric.environmentId}`,
+            `${clientMetric.featureName}:${clientMetric.environmentId}`,
           ),
       )
       .filter(
         (clientMetric) => clientMetric.yes > 0 || clientMetric.no > 0,
       )
       .forEach((clientMetric) => {
-        const key = `${clientMetric.featureId}:${clientMetric.environmentId}`;
+        const key = `${clientMetric.featureName}:${clientMetric.environmentId}`;
         this.lastSeenToggles.set(key, {
-          featureName: clientMetric.featureId,
+          featureName: clientMetric.featureName,
           environmentId: clientMetric.environmentId,
         });
       });

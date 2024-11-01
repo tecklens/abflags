@@ -13,6 +13,7 @@ import {useState} from "react";
 import {useToast} from "@client/components/ui/use-toast";
 import {get} from "lodash";
 import {FeatureStatus} from "@abflags/shared";
+import {useFeature} from "@client/lib/store/featureStore";
 
 const FeatureRepository = RepositoryFactory.get('feature')
 
@@ -24,6 +25,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const {updateId} = useFeature()
   const [isLoading, setIsLoading] = useState(false)
   const {toast} = useToast()
   const archive = (e: any) => {
@@ -35,6 +37,8 @@ export function DataTableRowActions<TData>({
           toast({
             title: 'Archive features successfully. Wait 10s for refresh'
           })
+
+          updateId()
         }
       })
       .catch((e: any) => {
@@ -55,6 +59,7 @@ export function DataTableRowActions<TData>({
           toast({
             title: 'Enable features successfully. Wait 10s for refresh'
           })
+          updateId()
         }
       })
       .catch((e: any) => {

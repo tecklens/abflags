@@ -274,8 +274,8 @@ export default function NewFeature() {
                       className={'text-red-500'}>*</span></FormLabel>
                     <FormDescription>The number of feature variations will have to be fully configured on the website
                       side, otherwise it will be hidden</FormDescription>
-                    <FormDescription>Variations will be scaled according to
-                      the <b>round-robin</b> algorithm</FormDescription>
+                    {/*<FormDescription>Variations will be scaled according to*/}
+                    {/*  the <b>round-robin</b> algorithm</FormDescription>*/}
                     <FormControl>
                       <Slider
                         vertical={false}

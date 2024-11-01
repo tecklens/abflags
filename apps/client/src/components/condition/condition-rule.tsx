@@ -8,46 +8,65 @@ import {
   SelectValue,
 } from '@client/components/ui/select';
 import React, {memo} from 'react';
-import {IconTrash} from '@tabler/icons-react';
+import {IconCopy, IconTrash} from '@tabler/icons-react';
 import {Button} from '@client/components/custom/button';
 import {Input} from '@client/components/ui/input';
-import {ConditionRuleState, ConditionRuleType, ConditionVariable,} from '@abflags/shared';
+import {ConditionRuleState, ConditionRuleType, ConditionVariable, Operator,} from '@abflags/shared';
 import {isNaN} from 'lodash';
 import {DateTimePicker} from '@client/components/ui/datetime-picker';
 import {TagInput} from 'emblor';
+import {Badge} from "@client/components/ui/badge";
+import {useToast} from "@client/components/ui/use-toast";
+import copy from "copy-to-clipboard";
 
 const operators: { type: ConditionRuleType; value: string[] }[] = [
   {
     type: 'number',
     value: [
-      'is equal to',
-      'is not equal to',
-      'contains',
-      'not contain',
-      'is empty',
-      'is not empty',
-      '>',
-      '<',
-      '>=',
-      '<=',
+      Operator.IS_EQUAL_TO,
+      Operator.IS_NOT_EQUAL_TO,
+      Operator.IN,
+      Operator.NOT_IN,
+      Operator.MORE_THAN,
+      Operator.LESS_THAN,
+      Operator.MORE_THAN_EQUAL,
+      Operator.LESS_THAN_EQUAL,
     ],
   },
   {
     type: 'select',
-    value: ['is equal to', 'is not equal to', '>', '<', '>=', '<='],
-  },
-  {
-    type: 'text',
-    value: ['is equal to', 'is not equal to', 'contains', '>', '<', '>=', '<='],
+    value: [
+      Operator.IS_EQUAL_TO,
+      Operator.IS_NOT_EQUAL_TO,
+      Operator.MORE_THAN,
+      Operator.LESS_THAN,
+      Operator.MORE_THAN_EQUAL,
+      Operator.LESS_THAN_EQUAL
+    ],
   },
   {
     type: 'string',
-    value: ['is equal to', 'is not equal to', 'contains', '>', '<', '>=', '<='],
+    value: [
+      Operator.IS_EQUAL_TO,
+      Operator.IS_NOT_EQUAL_TO,
+      Operator.IN,
+      Operator.MORE_THAN,
+      Operator.LESS_THAN,
+      Operator.MORE_THAN_EQUAL,
+      Operator.LESS_THAN_EQUAL
+    ],
   },
   {
     type: 'date',
-    value: ['is equal to', 'is not equal to', '>', '<', '>=', '<='],
-  },
+    value: [
+      Operator.IS_EQUAL_TO,
+      Operator.IS_NOT_EQUAL_TO,
+      Operator.MORE_THAN,
+      Operator.LESS_THAN,
+      Operator.MORE_THAN_EQUAL,
+      Operator.LESS_THAN_EQUAL
+    ],
+  }
 ];
 
 interface ConditionRuleProps {
@@ -56,6 +75,7 @@ interface ConditionRuleProps {
   variables: ConditionVariable[];
   isValidTree: boolean;
   readonly?: boolean;
+  onRemove: () => void
 }
 
 const ConditionRuleErrorMessage = ({
@@ -89,10 +109,10 @@ const ConditionRuleValue = memo(
     const props: any = inputProps?.props;
 
     if (inputProps?.type === 'number') {
-      if (operator === 'contains') {
+      if (operator === Operator.IN || operator === Operator.NOT_IN) {
         return (
           <TagInput
-            maxTags={10}
+            maxTags={20}
             activeTagIndex={0}
             setActiveTagIndex={() => {
             }}
@@ -163,7 +183,7 @@ const ConditionRuleValue = memo(
       );
     }
 
-    if (inputProps?.type === 'string' || inputProps?.type === 'text') {
+    if (inputProps?.type === 'string') {
       if (operator === 'contains') {
         return (
           <TagInput
@@ -207,8 +227,17 @@ export default function ConditionRule({
                                         variables,
                                         isValidTree = true,
                                         readonly,
+                                        onRemove
                                       }: ConditionRuleProps) {
-  const variable = variables.find((f) => f.id === rule?.variable);
+  const {toast} = useToast()
+
+  const onCopyToClipboard = (url: string) => {
+    copy(url);
+    toast({
+      title: 'Copied to clipboard',
+    });
+  };
+  const variable = variables.find((f) => f.label === rule?.variable);
 
   const ops = operators.find((f) => f.type === variable?.type);
 
@@ -216,75 +245,92 @@ export default function ConditionRule({
     <div className={'p-1 flex flex-col gap-0.5 rounded shadow ml-2'}>
       <div className={'flex items-center gap-2 w-full'}>
         <div className={'flex-1 flex gap-2'}>
-          <Select
-            value={rule?.variable}
-            onValueChange={(v) => {
-              onChange({
-                ...rule,
-                variable: v,
-                value: undefined,
-              });
-            }}
-          >
-            <SelectTrigger className="py-0 h-7 w-fit min-w-36">
-              <SelectValue placeholder="Select a variable">
-                {variable?.label}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Select one variable</SelectLabel>
-                {variables.map((e) => (
-                  <SelectItem key={e.id} value={e.id}>
-                    {e.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          {readonly ?
+            <Badge variant={'outline'}>{rule?.variable}</Badge>
+            : <Select
+              disabled={readonly}
+              value={rule?.variable}
+              onValueChange={(v) => {
+                const variable = variables.find((f) => f.label === v);
+                if (variable)
+                  onChange({
+                    ...rule,
+                    variable: v,
+                    variableType: variable.type,
+                    value: undefined,
+                  });
+              }}
+            >
+              <SelectTrigger className="py-0 h-7 w-fit min-w-36">
+                <SelectValue placeholder="Select a variable">
+                  {variable?.label}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Select one variable</SelectLabel>
+                  {variables.map((e) => (
+                    <SelectItem key={e.id} value={e.label}>
+                      {e.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>}
 
-          <Select
-            value={rule.operator}
-            onValueChange={(v) => {
-              onChange({
-                ...rule,
-                operator: v,
-              });
-            }}
-          >
-            <SelectTrigger className="py-0 h-7 w-fit min-w-24">
-              <SelectValue placeholder="Select a operator">
-                {rule.operator}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>contains</SelectLabel>
-                {ops?.value?.map((e) => (
-                  <SelectItem key={e} value={e}>
-                    {e}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          {readonly ?
+            <Badge>{rule.operator}</Badge>
+            : <Select
+              disabled={readonly}
+              value={rule.operator}
+              onValueChange={(v) => {
+                onChange({
+                  ...rule,
+                  operator: v,
+                });
+              }}
+            >
+              <SelectTrigger className="py-0 h-7 w-fit min-w-24">
+                <SelectValue placeholder="Select a operator">
+                  {rule.operator}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>contains</SelectLabel>
+                  {ops?.value?.map((e) => (
+                    <SelectItem key={e} value={e}>
+                      {e}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>}
 
-          <ConditionRuleValue
-            operator={rule.operator}
-            readonly={readonly}
-            inputProps={variable}
-            onChange={(v) => {
-              onChange({
-                ...rule,
-                value: v,
-              });
-            }}
-            value={rule.value}
-          />
+          {readonly ?
+            <div className={'inline-flex gap-2 items-center'}>
+              <Badge variant={'secondary'}>{rule.value?.toString()}</Badge>
+              <Button size={'smallicon'} variant={'outline'}
+                      onClick={() => onCopyToClipboard(rule.value?.toString() ?? '')}>
+                <IconCopy size={10}/>
+              </Button>
+            </div>
+            : <ConditionRuleValue
+              operator={rule.operator}
+              readonly={readonly}
+              inputProps={variable}
+              onChange={(v) => {
+                onChange({
+                  ...rule,
+                  value: v,
+                });
+              }}
+              value={rule.value}
+            />}
         </div>
         {readonly ?
           null
-          : <Button size={'icon'} className={'py-0 h-7 w-7'}>
+          : <Button size={'icon'} className={'py-0 h-7 w-7'} type={'button'} onClick={onRemove}>
             <IconTrash color={'red'} size={15}/>
           </Button>
         }

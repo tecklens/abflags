@@ -5,27 +5,28 @@ import ThemeSwitch from '@client/components/theme-switch'
 import { UserNav } from '@client/components/user-nav'
 import { useTheme } from '@client/components/theme-provider'
 import { useState } from 'react'
-import WorkflowGetStarted from '@client/pages/get-started/components/WorkflowGetStarted'
+import FlagsGetStarted from '@client/pages/get-started/components/FlagsGetStarted'
 import { AnimatePresence } from 'framer-motion'
 import EnvironmentGetStarted from '@client/pages/get-started/components/EnvironmentGetStarted'
-import SendNotificationGetStarted from '@client/pages/get-started/components/SendNotificationGetStarted'
+import UseSdkGetStarted from '@client/pages/get-started/components/UseSdkGetStarted'
+import ProjectGetStarted from "@client/pages/get-started/components/ProjectGetStarted";
 
 const tabs = [
   {
-    title: 'Create Provider',
-    key: 'provider',
+    title: 'Create Project',
+    key: 'project',
   },
   {
-    title: 'Create Workflow',
-    key: 'workflow',
+    title: 'Create Future Flags',
+    key: 'flags',
   },
   {
-    title: 'Environment',
-    key: 'environment',
+    title: 'API Key',
+    key: 'api-key',
   },
   {
-    title: 'Send notification',
-    key: 'send-noti',
+    title: 'Use SDK',
+    key: 'sdk',
   },
 ]
 export default function GetStarted() {
@@ -51,7 +52,7 @@ export default function GetStarted() {
           </h1>
         </div>
         <div className={'flex space-x-3 lg:space-x-6 w-full'}>
-          <div className={'flex flex-col space-y-2 gap-6 w-[200px] font-semibold my-6'}>
+          <div className={'flex flex-col space-y-2 gap-4 w-[200px] font-semibold my-6'}>
             {tabs.map(e => (
               <div
                 key={e.key}
@@ -68,14 +69,14 @@ export default function GetStarted() {
           </div>
           <div className={'flex-1 py-8'}>
             <AnimatePresence>
-              {tab === 'provider'
-                ? <div></div>
-                : tab === 'workflow'
-                  ? <WorkflowGetStarted key={'workflow'} />
-                  : tab === 'environment'
+              {tab === 'project'
+                ? <ProjectGetStarted />
+                : tab === 'flags'
+                  ? <FlagsGetStarted key={'flags'} />
+                  : tab === 'api-key'
                     ? <EnvironmentGetStarted />
-                    : tab === 'send-noti'
-                      ? <SendNotificationGetStarted />
+                    : tab === 'sdk'
+                      ? <UseSdkGetStarted />
                       : null}
             </AnimatePresence>
           </div>

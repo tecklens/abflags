@@ -1,4 +1,4 @@
-export type ConditionRuleType = 'text' | 'email' | 'password' | 'number' | 'select' | 'string' | 'date';
+export type ConditionRuleType = 'number' | 'select' | 'string' | 'date';
 export type ConditionVariable = {
   id: string;
   label: string;
@@ -7,7 +7,7 @@ export type ConditionVariable = {
 } | {
   id: string;
   label: string;
-  type: string | 'string' | 'text' | 'email' | 'password',
+  type: 'string',
   props: ConditionStringProps;
 } | {
   id: string;
@@ -54,8 +54,9 @@ export type ConditionSelectProps = {
 
 export type ConditionRuleState = {
   variable: string;
+  variableType?: string;
   operator: string;
-  value?: string;
+  value?: string | string[] | Date;
   id: string;
 }
 

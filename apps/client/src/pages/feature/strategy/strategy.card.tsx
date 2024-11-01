@@ -23,10 +23,11 @@ import {useNavigate} from "react-router-dom";
 import PieChartMini from "@client/components/custom/pie-chart-mini";
 import {Badge} from "@client/components/ui/badge";
 import ConditionGroup from "@client/components/condition/condition-group";
+import React, {memo} from "react";
 
 const FeatureRepository = RepositoryFactory.get('feature')
 
-export default function StrategyCard({strategy, onReload}: { strategy: IFeatureStrategy, onReload: () => void }) {
+const StrategyCard = memo(React.forwardRef(({strategy, onReload, isDragging, onEdit, ...props}: any, ref) => {
   const {toast} = useToast()
   const navigate = useNavigate()
   const disable = () => {
@@ -84,12 +85,14 @@ export default function StrategyCard({strategy, onReload}: { strategy: IFeatureS
           onReload()
         } else {
           toast({
+            variant: 'destructive',
             title: 'Delete strategy failed'
           })
         }
       })
       .catch(() => {
         toast({
+          variant: 'destructive',
           title: 'Delete strategy failed'
         })
       })
@@ -98,7 +101,8 @@ export default function StrategyCard({strategy, onReload}: { strategy: IFeatureS
   const disabled = strategy.status === FeatureStrategyStatus.INACTIVE
 
   return (
-    <Card className={`${disabled ? 'bg-gray-100 dark:bg-transparent' : 'bg-white dark:bg-gray-900'}`}>
+    <Card ref={ref} {...props} className={`${disabled ? 'bg-gray-100 dark:bg-transparent' : 'bg-white dark:bg-gray-900'}
+    ${isDragging ? 'bg-primary/20' : ''}`}>
       <CardHeader className={'p-2'}>
         <div className={'w-full flex gap-3 items-center'}>
           <IconArrowRampRight/>
@@ -111,7 +115,7 @@ export default function StrategyCard({strategy, onReload}: { strategy: IFeatureS
             <Button variant={'ghost'} size={'icon'}>
               <IconCopyPlus size={20}/>
             </Button>
-            <Button variant={'ghost'} size={'icon'}>
+            <Button variant={'ghost'} size={'icon'} onClick={onEdit}>
               <IconEdit size={20}/>
             </Button>
             <DropdownMenu>
@@ -144,15 +148,17 @@ export default function StrategyCard({strategy, onReload}: { strategy: IFeatureS
       </CardHeader>
       <CardContent className={'border-t p-2 flex flex-col gap-2'}>
         <div className={'flex gap-3 items-center w-full border p-2 rounded'}>
-          <PieChartMini />
+          <PieChartMini/>
           <div className={'flex-1 inline-flex gap-2'}>
-            <Badge>54%</Badge>
+            <Badge>{strategy.percentage}%</Badge>
             <span>of your base with <b>userId</b> is included</span>
           </div>
         </div>
         <div className={'flex gap-3 items-center w-full'}>
           <ConditionGroup
-            onChange={(v) => {}}
+            value={strategy.conditions ? strategy.conditions[0] : {}}
+            onChange={(v) => {
+            }}
             variables={[]}
             readonly={true}
           />
@@ -160,4 +166,6 @@ export default function StrategyCard({strategy, onReload}: { strategy: IFeatureS
       </CardContent>
     </Card>
   )
-}
+}))
+
+export default StrategyCard

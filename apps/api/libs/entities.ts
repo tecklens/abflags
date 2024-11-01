@@ -6,7 +6,7 @@ import {ApiKeyEntity} from "@repository/api-key";
 import {EnvironmentEntity} from "@repository/environment";
 import {MemberEntity} from "@repository/member";
 import {ProjectEntity} from "@repository/project";
-import {FeatureEntity, FeatureHealthEntity, FeatureStrategyEntity} from "@repository/feature";
+import {FeatureEntity, FeatureHealthEntity, FeatureStrategyEntity, FeatureVariantEntity} from "@repository/feature";
 import {VariableEntity} from "@repository/variable";
 import { EventEntity } from '@repository/event';
 import { LastSeenAtMetricsEntity } from '@repository/last-seen-at-metrics';
@@ -31,4 +31,5 @@ export const entities = [
   FeatureHealthEntity,
   ApplicationEntity,
   FeatureStrategyEntity,
+  FeatureVariantEntity,
 ];
