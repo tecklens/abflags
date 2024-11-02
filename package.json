@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "api:docker": "nx serve api --host=0.0.0.0",
+    "client:docker": "nx serve client --host=0.0.0.0",
     "start": "nx run-many --parallel --target=serve --projects=api,client "
   },
   "private": true,

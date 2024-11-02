@@ -1,0 +1,23 @@
+version: '1'
+
+services:
+  # Nestjs App
+  ab-api:
+    extends:
+      file: docker-compose.base.yml
+      service: nx-app-base
+    command: npm run api:docker
+    ports:
+      - 4200:4200
+
+  # React App
+  ab-client:
+    extends:
+      file: docker-compose.base.yml
+      service: nx-app-base
+    command: npm run client:docker
+    ports:
+      - 3000:3000 # API Entry port
+
+volumes:
+  mono-node-modules: null
