@@ -22,11 +22,11 @@ docker pull abflags/abflags
 ```
 or 
 ```docker
-
-```
 git clone https://github.com/tecklens/abflags.git
 cd abflags
 docker-compose up -d
+```
+
 ---
 
 ## Documentation and Support
