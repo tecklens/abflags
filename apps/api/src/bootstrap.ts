@@ -106,7 +106,7 @@ export default async function bootstrap() {
   const port = configService.get('PORT') ?? 3232;
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(port);
-  Logger.log(`Starting UserApplication using Nestjs 10.0.0 on port: ${port}`);
+  Logger.log(`Starting Abflags using Nestjs 10.0.0 on port: ${port}`);
 
   if (module.hot) {
     module.hot.accept();
