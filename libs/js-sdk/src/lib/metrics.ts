@@ -1,28 +1,24 @@
-import {notNullOrUndefined} from "../utils";
-import {HEADER_API_KEY} from "../types";
+import {currentEnvironment, notNullOrUndefined} from "../utils";
+import {Environment, HEADER_API_KEY} from "../types";
 
 export interface MetricsOptions {
   onError: OnError;
   onSent?: OnSent;
   appName: string;
-  metricsInterval: number;
+  metricsInterval?: number;
   disableMetrics?: boolean;
   url: URL | string;
   clientKey: string;
   fetch: any;
   customHeaders?: Record<string, string>;
-  metricsIntervalInitial: number;
-}
-
-interface VariantBucket {
-  [s: string]: number;
+  metricsIntervalInitial?: number;
 }
 
 interface Bucket {
   start: Date;
   stop: Date | null;
-  toggles: {
-    [s: string]: { yes: number; no: number; variants: VariantBucket };
+  features: {
+    [s: string]: { yes: number; no: number; };
   };
 }
 
@@ -30,6 +26,9 @@ interface Payload {
   bucket: Bucket;
   appName: string;
   instanceId: string;
+  createdAt: Date;
+  os: string;
+  environment: string;
 }
 
 type OnError = (error: unknown) => void;
@@ -42,14 +41,15 @@ export class Metrics {
   private readonly onSent: OnSent;
   private bucket: Bucket;
   private readonly appName: string;
-  private readonly metricsInterval: number;
+  private readonly metricsInterval?: number;
   private readonly disabled: boolean;
   private readonly url: URL;
   private readonly clientKey: string;
   private timer: any;
   private readonly fetch: any;
   private customHeaders: Record<string, string>;
-  private readonly metricsIntervalInitial: number;
+  private readonly metricsIntervalInitial?: number;
+  private environment: Environment;
 
   constructor({
                 onError,
@@ -66,14 +66,15 @@ export class Metrics {
     this.onError = onError;
     this.onSent = onSent || doNothing;
     this.disabled = disableMetrics;
-    this.metricsInterval = metricsInterval * 1000;
-    this.metricsIntervalInitial = metricsIntervalInitial * 1000;
+    this.metricsInterval = metricsInterval ??  1000;
+    this.metricsIntervalInitial = metricsIntervalInitial ?? 1000;
     this.appName = appName;
     this.url = url instanceof URL ? url : new URL(url);
     this.clientKey = clientKey;
     this.bucket = this.createEmptyBucket();
     this.fetch = fetch;
     this.customHeaders = customHeaders;
+    this.environment = currentEnvironment();
   }
 
   public start() {
@@ -85,7 +86,7 @@ export class Metrics {
       typeof this.metricsInterval === 'number' &&
       this.metricsInterval > 0
     ) {
-      if (this.metricsIntervalInitial > 0) {
+      if (this.metricsIntervalInitial && this.metricsIntervalInitial > 0) {
         setTimeout(async () => {
           this.startTimer();
           await this.sendMetrics();
@@ -107,7 +108,7 @@ export class Metrics {
     return {
       start: new Date(),
       stop: null,
-      toggles: {},
+      features: {},
     };
   }
 
@@ -128,7 +129,7 @@ export class Metrics {
   public async sendMetrics(): Promise<void> {
     /* istanbul ignore next if */
 
-    const url = `${this.url}/client/metrics`;
+    const url = `${this.url}ab/v1/metric`;
     const payload = this.getPayload();
 
     if (this.bucketIsEmpty(payload)) {
@@ -144,7 +145,7 @@ export class Metrics {
       });
       this.onSent(payload);
     } catch (e) {
-      console.error('Unleash: unable to send feature metrics', e);
+      console.error('AbFlags: unable to send feature metrics', e);
       this.onError(e);
     }
   }
@@ -154,20 +155,7 @@ export class Metrics {
       return false;
     }
     this.assertBucket(name);
-    this.bucket.toggles[name][enabled ? 'yes' : 'no']++;
-    return true;
-  }
-
-  public countVariant(name: string, variant: string): boolean {
-    if (this.disabled || !this.bucket) {
-      return false;
-    }
-    this.assertBucket(name);
-    if (this.bucket.toggles[name].variants[variant]) {
-      this.bucket.toggles[name].variants[variant] += 1;
-    } else {
-      this.bucket.toggles[name].variants[variant] = 1;
-    }
+    this.bucket.features[name][enabled ? 'yes' : 'no']++;
     return true;
   }
 
@@ -175,11 +163,10 @@ export class Metrics {
     if (this.disabled || !this.bucket) {
       return false;
     }
-    if (!this.bucket.toggles[name]) {
-      this.bucket.toggles[name] = {
+    if (!this.bucket.features[name]) {
+      this.bucket.features[name] = {
         yes: 0,
         no: 0,
-        variants: {},
       };
     }
   }
@@ -191,7 +178,7 @@ export class Metrics {
   }
 
   private bucketIsEmpty(payload: Payload) {
-    return Object.keys(payload.bucket.toggles).length === 0;
+    return Object.keys(payload.bucket.features).length === 0;
   }
 
   private getPayload(): Payload {
@@ -200,8 +187,11 @@ export class Metrics {
 
     return {
       bucket,
+      createdAt: new Date(),
       appName: this.appName,
       instanceId: 'browser',
+      os: this.environment.os,
+      environment: this.environment.environment,
     };
   }
 }

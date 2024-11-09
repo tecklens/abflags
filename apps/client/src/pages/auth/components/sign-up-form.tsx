@@ -39,7 +39,7 @@ const formSchema = z
         message: 'Maximum password length is 64',
       }),
     confirmPassword: z.string(),
-    organizationName: z.string(),
+    projectName: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords don\'t match.',
@@ -164,7 +164,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
             />
             <FormField
               control={form.control}
-              name="organizationName"
+              name="projectName"
               render={({ field }) => (
                 <FormItem className="space-y-1">
                   <FormLabel>Organization Name</FormLabel>

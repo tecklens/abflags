@@ -15,6 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@abflags/react-sdk": ["libs/react-sdk/src/index.ts"],
+      "@abflags/js-sdk": ["libs/js-sdk/src/index.ts"],
       "@abflags/shared": ["libs/shared/src/index.ts"],
       "@abtypes/*": ["apps/api/src/types/*"],
       "@app/*": ["apps/api/src/app/*"],

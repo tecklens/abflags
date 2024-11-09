@@ -56,7 +56,7 @@ export type ConditionRuleState = {
   variable: string;
   variableType?: string;
   operator: string;
-  value?: string | string[] | Date;
+  value?: string | string[] | Date | {id: string, text: string}[];
   id: string;
 }
 

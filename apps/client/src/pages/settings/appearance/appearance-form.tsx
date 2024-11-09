@@ -70,36 +70,36 @@ export function AppearanceForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
-          control={form.control}
-          name='font'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Font</FormLabel>
-              <div className='relative w-max'>
-                <FormControl>
-                  <select
-                    className={cn(
-                      buttonVariants({ variant: 'outline' }),
-                      'w-[200px] appearance-none font-normal'
-                    )}
-                    {...field}
-                  >
-                    {listFonts.map(e => (
-                      <option value={e} key={e}>{e}</option>
+        {/*<FormField*/}
+        {/*  control={form.control}*/}
+        {/*  name='font'*/}
+        {/*  render={({ field }) => (*/}
+        {/*    <FormItem>*/}
+        {/*      <FormLabel>Font</FormLabel>*/}
+        {/*      <div className='relative w-max'>*/}
+        {/*        <FormControl>*/}
+        {/*          <select*/}
+        {/*            className={cn(*/}
+        {/*              buttonVariants({ variant: 'outline' }),*/}
+        {/*              'w-[200px] appearance-none font-normal'*/}
+        {/*            )}*/}
+        {/*            {...field}*/}
+        {/*          >*/}
+        {/*            {listFonts.map(e => (*/}
+        {/*              <option value={e} key={e}>{e}</option>*/}
 
-                    ))}
-                  </select>
-                </FormControl>
-                <ChevronDownIcon className='absolute right-3 top-2.5 h-4 w-4 opacity-50' />
-              </div>
-              <FormDescription>
-                Set the font you want to use in the dashboard.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/*            ))}*/}
+        {/*          </select>*/}
+        {/*        </FormControl>*/}
+        {/*        <ChevronDownIcon className='absolute right-3 top-2.5 h-4 w-4 opacity-50' />*/}
+        {/*      </div>*/}
+        {/*      <FormDescription>*/}
+        {/*        Set the font you want to use in the dashboard.*/}
+        {/*      </FormDescription>*/}
+        {/*      <FormMessage />*/}
+        {/*    </FormItem>*/}
+        {/*  )}*/}
+        {/*/>*/}
         <FormField
           control={form.control}
           name='theme'

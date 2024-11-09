@@ -16,13 +16,8 @@ export default function UseSdkGetStarted() {
       animate={{ x: 0 }}
       className={'flex flex-col space-y-2 lg:space-y-6'}
     >
-      <div>Coming Soon</div>
-      {/*<div className={'font-semibold text-lg'}>Send your first notification</div>*/}
-      {/*<div className={'max-w-md'}>Once you have a workflow created and committed to your development environment,*/}
-      {/*  trigger that workflow with a notify call to send your first notification.*/}
-      {/*</div>*/}
-      <Link to={'/workflow'}>
-        <Button>Trigger notification from API</Button>
+      <Link to={'https://github.com/tecklens/abflags/wiki/Use-SDK'} target={'_blank'}>
+        <Button>How to use SDK</Button>
       </Link>
     </motion.div>
   )

@@ -42,3 +42,7 @@ Thumbs.db
 .nx/workspace-data
 
 **/.env
+**/.env.prod
+
+build
+**/build

@@ -18,7 +18,7 @@ export class AbClient extends TinyEmitter {
   private lastRefreshTimestamp: number;
   private features?: Feature[];
   private readonly fetch: any;
-  private eTag = '';
+  private etag: string = '';
   private abortController?: AbortController | null;
   private lastError: any;
   private fetchedFromServer = false;
@@ -46,13 +46,14 @@ export class AbClient extends TinyEmitter {
       (typeof window !== 'undefined'
         ? new LocalStorageProvider()
         : new InMemoryStorageProvider());
-    if (!fetch) {
-      this.fetch = resolveFetch()
-      console.debug(
+    this.fetch = resolveFetch()
+    if (!this.fetch) {
+      console.error(
         'You must either provide your own "fetch" implementation or run in an environment where "fetch" is available.'
       );
-    } else this.fetch = fetch;
+    }
 
+    this._config = config;
     this.ready = new Promise((resolve) => {
       this.init()
         .then(resolve)
@@ -67,19 +68,18 @@ export class AbClient extends TinyEmitter {
     this.features = [];
     this.lastRefreshTimestamp = 0;
     this.state = 'initializing';
-    this._config = config;
 
     this.metrics = new Metrics({
       onError: this.emit.bind(this, EVENTS.ERROR),
       onSent: this.emit.bind(this, EVENTS.SENT),
       appName: this._config.appName,
-      metricsInterval: this._config.metricsInterval ?? 10,
+      metricsInterval: this._config.metricsInterval ?? 5000,
       disableMetrics: this._config.disableMetrics ?? false,
       url: this.url,
       clientKey: this._config.clientKey,
-      fetch,
+      fetch: this.fetch,
       customHeaders: this._config.customHeaders,
-      metricsIntervalInitial: this._config.metricsIntervalInitial ?? 10,
+      metricsIntervalInitial: this._config.metricsIntervalInitial ?? 5000,
     });
   }
 
@@ -103,9 +103,9 @@ export class AbClient extends TinyEmitter {
     }
     await this.ready;
     this.metrics.start();
-    const interval = this._config.refreshInterval ?? REFRESH_INTERVAL_INIT;
+    const interval = this._config.refreshInterval && this._config.refreshInterval > 500 ? this._config.refreshInterval : REFRESH_INTERVAL_INIT;
 
-    await this.initialFetchToggles();
+    await this.initialFetchFeatures();
 
     if (interval > 0) {
       this.timerRef = setInterval(() => this.fetchFeatures(), interval);
@@ -161,7 +161,7 @@ export class AbClient extends TinyEmitter {
   private isUpToDate(): boolean {
     const now = Date.now();
 
-    const ttl = this._config.refreshInterval || REFRESH_INTERVAL_INIT;
+    const ttl = this._config.refreshInterval && this._config.refreshInterval > 500 ? this._config.refreshInterval : REFRESH_INTERVAL_INIT;
 
     return (
       this.lastRefreshTimestamp > 0 &&
@@ -169,7 +169,8 @@ export class AbClient extends TinyEmitter {
       now - this.lastRefreshTimestamp <= ttl
     );
   }
-  private initialFetchToggles() {
+
+  private initialFetchFeatures() {
     if (this.isUpToDate()) {
       if (!this.fetchedFromServer) {
         this.fetchedFromServer = true;
@@ -190,22 +191,21 @@ export class AbClient extends TinyEmitter {
         ? this.abortController.signal
         : undefined;
       try {
-        const url = this.url;
-        const method = 'POST';
-        const body = JSON.stringify({
-          appName: this._config.appName,
-          environment: this._config.environment,
-          userId: this._config.userId,
-          sessionId: this._config.sessionId,
-          currentTime: this._config.currentTime,
-          properties: this._config.properties
-        })
+        const url = new URL('/ab/v1/feature/frontend', this.url);
+        const method = 'GET';
+        url.searchParams.set('appName', this._config.appName)
+        url.searchParams.set('environment', this._config.environment ?? '')
+        url.searchParams.set('userId', this._config.userId ?? '')
+        url.searchParams.set('sessionId', this._config.sessionId ?? '')
+        url.searchParams.set('currentTime', this._config.currentTime ?? new Date().toString())
+        for (let entry of Object.entries(this._config.properties ?? {})) {
+          url.searchParams.set(entry[0], entry[1])
+        }
 
         const response = await this.fetch(url.toString(), {
           method,
           cache: 'no-cache',
           headers: this.getHeaders(),
-          body,
           signal,
         });
         if (this.state === 'error' && response.status < 400) {
@@ -214,9 +214,10 @@ export class AbClient extends TinyEmitter {
         }
 
         if (response.ok) {
-          this.eTag = response.headers.get('ETag') || '';
+          this.etag = response.headers.get('ETag') || '';
           const data = await response.json();
-          await this.storeToggles(data.toggles);
+
+          await this.storeFeatures(data);
 
           if (this.state !== 'healthy') {
             this.state = 'healthy';
@@ -225,12 +226,12 @@ export class AbClient extends TinyEmitter {
             this.fetchedFromServer = true;
             this.setReady();
           }
-          this.storeLastRefreshTimestamp();
+          await this.storeLastRefreshTimestamp();
         } else if (response.status === 304) {
-          this.storeLastRefreshTimestamp();
+          await this.storeLastRefreshTimestamp();
         } else {
           console.error(
-            'Unleash: Fetching feature toggles did not have an ok response'
+            'AbFlags: Fetching feature toggles did not have an ok response'
           );
           this.state = 'error';
           this.emit(EVENTS.ERROR, {
@@ -253,7 +254,7 @@ export class AbClient extends TinyEmitter {
           )
         ) {
           console.error(
-            'Unleash: unable to fetch feature toggles',
+            'AbFlags: unable to fetch feature toggles',
             e
           );
           this.state = 'error';
@@ -266,7 +267,7 @@ export class AbClient extends TinyEmitter {
     }
   }
 
-  private async storeToggles(features: Feature[]): Promise<void> {
+  private async storeFeatures(features: Feature[]): Promise<void> {
     this.features = features;
     this.emit(EVENTS.UPDATE);
     await this.storage.save(this.storeKey, features);
@@ -277,13 +278,21 @@ export class AbClient extends TinyEmitter {
       [HEADER_API_KEY]: this._config.clientKey,
       Accept: 'application/json',
     };
-      headers['Content-Type'] = 'application/json';
-    if (this.eTag) {
-      headers['If-None-Match'] = this.eTag;
+    headers['Content-Type'] = 'application/json';
+    if (this.etag) {
+      headers['If-None-Match'] = this.etag;
     }
     Object.entries(this._config.customHeaders ?? {})
       .filter(notNullOrUndefined)
       .forEach(([name, value]) => (headers[name] = value));
     return headers;
+  }
+
+  isEnabled(key: string) {
+    const enabled = !!this.features?.find(f => f.name === key)
+
+    this.metrics.count(key, enabled);
+
+    return enabled;
   }
 }

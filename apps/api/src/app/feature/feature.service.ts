@@ -16,26 +16,37 @@ import {
   Operator
 } from "@abflags/shared";
 import {
+  AnalysisCustomerRequest,
   CreateFeatureRequestDto,
   CreateStrategyRequest,
   FeatureDto,
   FrontendFeatureRequest,
-  GetFeatureRequestDto,
+  GetFeatureRequestDto, UpdateFeatureDescriptionRequest,
   UpdateStrategyRequest
 } from "@app/feature/dtos";
 import {Transactional} from "typeorm-transactional";
 import {InjectQueue} from "@nestjs/bullmq";
 import {Queue} from "bullmq";
-import {get, reduce} from "lodash";
+import {cloneDeep, get, reduce} from "lodash";
 import {normalizedStrategyValue} from "@client/utils/normalize";
+import {Cron, CronExpression} from "@nestjs/schedule";
+import {CustomerInsightsEntity, CustomerInsightsRepository, CustomerRepository} from "@repository/user";
+import {ProjectRepository} from "@repository/project";
+import {format} from "date-fns";
 
 @Injectable()
 export class FeatureService {
+  private unsavedCustomer: Record<string, any>
+
   constructor(
     private readonly featureRepository: FeatureRepository,
     private readonly featureStrategyRepository: FeatureStrategyRepository,
+    private readonly customerRepository: CustomerRepository,
+    private readonly customerInsightsRepository: CustomerInsightsRepository,
+    private readonly projectRepository: ProjectRepository,
     @InjectQueue('event') private eventQueue: Queue<IBaseEvent, string, string>,
   ) {
+    this.unsavedCustomer = {}
   }
 
   async getByActiveProject(u: IJwtPayload, payload: GetFeatureRequestDto): Promise<IPaginatedResponseDto<FeatureEntity>> {
@@ -57,7 +68,7 @@ export class FeatureService {
 
   async createFeature(u: IJwtPayload, payload: CreateFeatureRequestDto) {
     const name = payload.name.trim();
-    if (await this.featureRepository.existByName(name)) {
+    if (await this.featureRepository.existByName(name, u.projectId)) {
       throw new ConflictException('Feature name is existed')
     }
 
@@ -196,6 +207,16 @@ export class FeatureService {
     })
   }
 
+  async updateFeatureDescription(u: IJwtPayload, id: FeatureId, payload: UpdateFeatureDescriptionRequest) {
+    return this.featureRepository.update({
+      _id: id,
+      _environmentId: u.environmentId,
+      _projectId: u.projectId,
+    }, {
+      description: payload.description,
+    })
+  }
+
   async getAllStrategy(u: IJwtPayload, id: FeatureId) {
     return this.featureStrategyRepository.find({
       where: {
@@ -298,6 +319,12 @@ export class FeatureService {
       }
     }
 
+    this.unsavedCustomer[context.userId + u.environmentId] = {
+      userId: context.userId,
+      environmentId: u.environmentId,
+      projectId: u.projectId,
+    }
+
     return finalFeature.map(e => ({
       name: e.name,
       _id: e._id,
@@ -368,6 +395,75 @@ export class FeatureService {
       }
 
       return rlt;
+    }
+  }
+
+  async getFeatureByType(u: IJwtPayload) {
+    const rlt = await this.featureRepository.groupByType(u.environmentId)
+
+    return reduce(rlt, (r, v) => ({
+      ...r,
+      [v.type]: v.value
+    }), {})
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async saveCustomerFromFeature() {
+    if (this.unsavedCustomer) {
+      const copy = cloneDeep(this.unsavedCustomer)
+      this.unsavedCustomer = {}
+      await this.customerRepository.save(Object.values(copy))
+    }
+  }
+
+  // @Cron(CronExpression.EVERY_2_HOURS)
+  // async clearCustomerLogAfterNMonth() {
+  //   await this.customerRepository.clearAfter(process.env.NUM_MONTH_CLEAR_CUSTOMER_LOG
+  //     ? parseInt(process.env.NUM_MONTH_CLEAR_CUSTOMER_LOG)
+  //     : 1)
+  // }
+
+  /**
+   *
+   */
+  @Cron('0 59 * * * *')
+  async analysisTotalCustomerEveryHour() {
+    const hour = format(new Date(), "yyyy-MM-dd HH");
+    const projects = await this.projectRepository.findBy({});
+
+    const start = new Date();
+    start.setHours(start.getHours(), 0, 0, 0);
+
+    const end = new Date();
+    end.setHours(end.getHours() + 1, 0, 0, 0);
+
+    let insights: CustomerInsightsEntity[] = []
+    for (let project of projects) {
+      insights = [...insights, {
+        hour: hour,
+        projectId: project._id,
+        totalUser: await this.customerRepository.countByProjectInHours(project._id, start, end)
+      }]
+    }
+
+    await this.customerInsightsRepository.save(insights);
+  }
+
+  async analysisCustomerByHour(u: IJwtPayload, payload: AnalysisCustomerRequest) {
+    return {
+      series: await this.customerInsightsRepository.find({
+        where: {
+          projectId: u.projectId
+        },
+        skip: payload.page * payload.limit,
+        take: payload.limit,
+        order: {
+          createdAt: 'DESC'
+        }
+      }),
+      total: await this.customerRepository.countBy({
+        projectId: u.projectId,
+      }),
     }
   }
 }

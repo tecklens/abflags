@@ -12,4 +12,4 @@ export function resolveContextValue(value: any, field: string): string | undefin
   return ''
 }
 
-export const cleanValues = (values: string[]) => values.filter((v) => !!v).map((v) => v.trim());
+export const cleanValues = (values: any[]) => values.filter((v) => !!v).map((v) => v.trim());

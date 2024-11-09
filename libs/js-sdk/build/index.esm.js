@@ -1,4 +1,4 @@
-var g = { exports: {} };
+var Y = { exports: {} };
 function u() {
 }
 u.prototype = {
@@ -25,53 +25,53 @@ u.prototype = {
   off: function(s, t) {
     var e = this.e || (this.e = {}), i = e[s], r = [];
     if (i && t)
-      for (var n = 0, o = i.length; n < o; n++)
+      for (var n = 0, a = i.length; n < a; n++)
         i[n].fn !== t && i[n].fn._ !== t && r.push(i[n]);
     return r.length ? e[s] = r : delete e[s], this;
   }
 };
-g.exports = u;
-var E = g.exports.TinyEmitter = u;
-const y = "api_key", f = "session_id", d = 2e3;
-let l;
-const T = new Uint8Array(16);
-function R() {
-  if (!l && (l = typeof crypto < "u" && crypto.getRandomValues && crypto.getRandomValues.bind(crypto), !l))
+Y.exports = u;
+var tt = Y.exports.TinyEmitter = u;
+const q = "api_key", f = "session_id", m = 30;
+let d;
+const et = new Uint8Array(16);
+function st() {
+  if (!d && (d = typeof crypto < "u" && crypto.getRandomValues && crypto.getRandomValues.bind(crypto), !d))
     throw new Error("crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported");
-  return l(T);
+  return d(et);
 }
-const a = [];
+const o = [];
 for (let s = 0; s < 256; ++s)
-  a.push((s + 256).toString(16).slice(1));
-function _(s, t = 0) {
-  return a[s[t + 0]] + a[s[t + 1]] + a[s[t + 2]] + a[s[t + 3]] + "-" + a[s[t + 4]] + a[s[t + 5]] + "-" + a[s[t + 6]] + a[s[t + 7]] + "-" + a[s[t + 8]] + a[s[t + 9]] + "-" + a[s[t + 10]] + a[s[t + 11]] + a[s[t + 12]] + a[s[t + 13]] + a[s[t + 14]] + a[s[t + 15]];
+  o.push((s + 256).toString(16).slice(1));
+function it(s, t = 0) {
+  return o[s[t + 0]] + o[s[t + 1]] + o[s[t + 2]] + o[s[t + 3]] + "-" + o[s[t + 4]] + o[s[t + 5]] + "-" + o[s[t + 6]] + o[s[t + 7]] + "-" + o[s[t + 8]] + o[s[t + 9]] + "-" + o[s[t + 10]] + o[s[t + 11]] + o[s[t + 12]] + o[s[t + 13]] + o[s[t + 14]] + o[s[t + 15]];
 }
-const S = typeof crypto < "u" && crypto.randomUUID && crypto.randomUUID.bind(crypto), m = {
-  randomUUID: S
+const rt = typeof crypto < "u" && crypto.randomUUID && crypto.randomUUID.bind(crypto), p = {
+  randomUUID: rt
 };
-function N(s, t, e) {
-  if (m.randomUUID && !t && !s)
-    return m.randomUUID();
+function nt(s, t, e) {
+  if (p.randomUUID && !t && !s)
+    return p.randomUUID();
   s = s || {};
-  const i = s.random || (s.rng || R)();
-  return i[6] = i[6] & 15 | 64, i[8] = i[8] & 63 | 128, _(i);
+  const i = s.random || (s.rng || st)();
+  return i[6] = i[6] & 15 | 64, i[8] = i[8] & 63 | 128, it(i);
 }
-class U {
+class ot {
   generateEventId() {
-    return N();
+    return nt();
   }
-  createImpressionEvent(t, e, i, r, n, o) {
-    const c = this.createBaseEvent(
+  createImpressionEvent(t, e, i, r, n, a) {
+    const l = this.createBaseEvent(
       t,
       e,
       i,
       r,
       n
     );
-    return o ? {
-      ...c,
-      variant: o
-    } : c;
+    return a ? {
+      ...l,
+      variant: a
+    } : l;
   }
   createBaseEvent(t, e, i, r, n) {
     return {
@@ -84,7 +84,7 @@ class U {
     };
   }
 }
-class A {
+class at {
   constructor(t = "ab:cache") {
     this.prefix = t;
   }
@@ -105,7 +105,7 @@ class A {
     }
   }
 }
-class x {
+class ht {
   constructor() {
     this.store = /* @__PURE__ */ new Map();
   }
@@ -116,6 +116,34 @@ class x {
     return this.store.get(t);
   }
 }
+var y;
+const ct = ((y = globalThis.window) == null ? void 0 : y.document) !== void 0;
+var v, b;
+const lt = ((b = (v = globalThis.process) == null ? void 0 : v.versions) == null ? void 0 : b.node) !== void 0;
+var w, T;
+(T = (w = globalThis.process) == null ? void 0 : w.versions) == null || T.bun;
+var I, E;
+(E = (I = globalThis.Deno) == null ? void 0 : I.version) == null || E.deno;
+var S, R;
+(R = (S = globalThis.process) == null ? void 0 : S.versions) == null || R.electron;
+var _, A;
+(A = (_ = globalThis.navigator) == null ? void 0 : _.userAgent) == null || A.includes("jsdom");
+typeof WorkerGlobalScope < "u" && globalThis instanceof WorkerGlobalScope;
+typeof DedicatedWorkerGlobalScope < "u" && globalThis instanceof DedicatedWorkerGlobalScope;
+typeof SharedWorkerGlobalScope < "u" && globalThis instanceof SharedWorkerGlobalScope;
+typeof ServiceWorkerGlobalScope < "u" && globalThis instanceof ServiceWorkerGlobalScope;
+var k, x;
+const c = (x = (k = globalThis.navigator) == null ? void 0 : k.userAgentData) == null ? void 0 : x.platform;
+var N, U, D, H;
+const dt = c === "macOS" || ((N = globalThis.navigator) == null ? void 0 : N.platform) === "MacIntel" || ((D = (U = globalThis.navigator) == null ? void 0 : U.userAgent) == null ? void 0 : D.includes(" Mac ")) === !0 || ((H = globalThis.process) == null ? void 0 : H.platform) === "darwin";
+var O, P;
+const ut = c === "Windows" || ((O = globalThis.navigator) == null ? void 0 : O.platform) === "Win32" || ((P = globalThis.process) == null ? void 0 : P.platform) === "win32";
+var F, C, K, M, L;
+const ft = c === "Linux" || ((C = (F = globalThis.navigator) == null ? void 0 : F.platform) == null ? void 0 : C.startsWith("Linux")) === !0 || ((M = (K = globalThis.navigator) == null ? void 0 : K.userAgent) == null ? void 0 : M.includes(" Linux ")) === !0 || ((L = globalThis.process) == null ? void 0 : L.platform) === "linux";
+var j, W, V;
+const mt = c === "iOS" || ((j = globalThis.navigator) == null ? void 0 : j.platform) === "MacIntel" && ((W = globalThis.navigator) == null ? void 0 : W.maxTouchPoints) > 1 || /iPad|iPhone|iPod/.test((V = globalThis.navigator) == null ? void 0 : V.platform);
+var B, G, $, J;
+c === "Android" || ((B = globalThis.navigator) == null ? void 0 : B.platform) === "Android" || (($ = (G = globalThis.navigator) == null ? void 0 : G.userAgent) == null ? void 0 : $.includes(" Android ")) === !0 || ((J = globalThis.process) == null || J.platform);
 const h = {
   INIT: "initialized",
   ERROR: "error",
@@ -124,30 +152,30 @@ const h = {
   IMPRESSION: "impression",
   SENT: "sent",
   RECOVERED: "recovered"
-}, v = ([, s]) => s != null, D = (s) => JSON.stringify(s), H = async (s) => {
+}, z = ([, s]) => s != null, pt = (s) => JSON.stringify(s), gt = async (s) => {
   var r, n;
   const t = typeof globalThis < "u" && ((r = globalThis.crypto) != null && r.subtle) ? (n = globalThis.crypto) == null ? void 0 : n.subtle : void 0;
   if (typeof TextEncoder > "u" || !(t != null && t.digest) || typeof Uint8Array > "u")
     throw new Error("Hashing function not available");
   const e = new TextEncoder().encode(s), i = await t.digest("SHA-256", e);
-  return Array.from(new Uint8Array(i)).map((o) => o.toString(16).padStart(2, "0")).join("");
-}, p = async (s) => {
-  const t = D(s);
+  return Array.from(new Uint8Array(i)).map((a) => a.toString(16).padStart(2, "0")).join("");
+}, g = async (s) => {
+  const t = pt(s);
   try {
-    return await H(t);
+    return await gt(t);
   } catch {
     return t;
   }
-}, k = () => {
+}, yt = () => {
   try {
     if (typeof window < "u" && "fetch" in window)
-      return window.fetch.bind(window);
+      return fetch.bind(window);
     if ("fetch" in globalThis)
-      return globalThis.fetch.bind(globalThis);
+      return fetch.bind(globalThis);
   } catch (s) {
     console.error('Unleash failed to resolve "fetch"', s);
   }
-}, F = () => {
+}, vt = () => {
   try {
     if (typeof window < "u" && "AbortController" in window)
       return new window.AbortController();
@@ -156,22 +184,25 @@ const h = {
   } catch (s) {
     console.error('Unleash failed to resolve "AbortController" factory', s);
   }
-}, O = () => {
+}, bt = () => ({
+  os: dt ? "mac-os" : ut ? "window" : ft ? "linux" : mt ? "ios" : "android",
+  environment: ct ? "browser" : lt ? "backend" : "web-worker"
+}), wt = () => {
 };
-class C {
+class Tt {
   constructor({
     onError: t,
     onSent: e,
     appName: i,
     metricsInterval: r,
     disableMetrics: n = !1,
-    url: o,
-    clientKey: c,
-    fetch: w,
-    customHeaders: b = {},
-    metricsIntervalInitial: I
+    url: a,
+    clientKey: l,
+    fetch: Q,
+    customHeaders: X = {},
+    metricsIntervalInitial: Z
   }) {
-    this.onError = t, this.onSent = e || O, this.disabled = n, this.metricsInterval = r ?? 1e3, this.metricsIntervalInitial = I ?? 1e3, this.appName = i, this.url = o instanceof URL ? o : new URL(o), this.clientKey = c, this.bucket = this.createEmptyBucket(), this.fetch = w, this.customHeaders = b;
+    this.onError = t, this.onSent = e || wt, this.disabled = n, this.metricsInterval = r ?? 1e3, this.metricsIntervalInitial = Z ?? 1e3, this.appName = i, this.url = a instanceof URL ? a : new URL(a), this.clientKey = l, this.bucket = this.createEmptyBucket(), this.fetch = Q, this.customHeaders = X, this.environment = bt();
   }
   start() {
     if (this.disabled)
@@ -192,11 +223,11 @@ class C {
   }
   getHeaders() {
     const t = {
-      [y]: this.clientKey,
+      [q]: this.clientKey,
       Accept: "application/json",
       "Content-Type": "application/json"
     };
-    return Object.entries(this.customHeaders).filter(v).forEach(([e, i]) => t[e] = i), t;
+    return Object.entries(this.customHeaders).filter(z).forEach(([e, i]) => t[e] = i), t;
   }
   async sendMetrics() {
     const t = `${this.url}ab/v1/metric`, e = this.getPayload();
@@ -233,37 +264,39 @@ class C {
   }
   getPayload() {
     const t = { ...this.bucket, stop: /* @__PURE__ */ new Date() };
-    return console.debug(`send metric ${t}`), this.bucket = this.createEmptyBucket(), {
+    return this.bucket = this.createEmptyBucket(), {
       bucket: t,
       createdAt: /* @__PURE__ */ new Date(),
       appName: this.appName,
-      instanceId: "browser"
+      instanceId: "browser",
+      os: this.environment.os,
+      environment: this.environment.environment
     };
   }
 }
-class P extends E {
+class It extends tt {
   constructor(t) {
     if (super(), this.readyEventEmitted = !1, this.storeKey = "feature", this.lastUpdateKey = "last-time", this.etag = "", this.fetchedFromServer = !1, this.started = !1, !t.clientKey)
       throw new Error("clientKey is required");
     if (!t.appName)
       throw new Error("appName is required.");
-    this.eventsHandler = new U(), this.url = t.url ?? "https://ab.wolfx.app", this.storage = t.storageProvider || (typeof window < "u" ? new A() : new x()), this.fetch = k(), this.fetch || console.error(
+    this.eventsHandler = new ot(), this.url = t.url ?? "https://ab.wolfx.app", this.storage = t.storageProvider || (typeof window < "u" ? new at() : new ht()), this.fetch = yt(), this.fetch || console.error(
       'You must either provide your own "fetch" implementation or run in an environment where "fetch" is available.'
     ), this._config = t, this.ready = new Promise((e) => {
       this.init().then(e).catch((i) => {
         console.debug(i), this.state = "error", this.emit(h.ERROR, i), this.lastError = i, e();
       });
-    }), this.features = [], this.lastRefreshTimestamp = 0, this.state = "initializing", this.metrics = new C({
+    }), this.features = [], this.lastRefreshTimestamp = 0, this.state = "initializing", this.metrics = new Tt({
       onError: this.emit.bind(this, h.ERROR),
       onSent: this.emit.bind(this, h.SENT),
       appName: this._config.appName,
-      metricsInterval: this._config.metricsInterval,
+      metricsInterval: this._config.metricsInterval ?? 5e3,
       disableMetrics: this._config.disableMetrics ?? !1,
       url: this.url,
       clientKey: this._config.clientKey,
       fetch: this.fetch,
       customHeaders: this._config.customHeaders,
-      metricsIntervalInitial: this._config.metricsIntervalInitial ?? 10
+      metricsIntervalInitial: this._config.metricsIntervalInitial ?? 5e3
     });
   }
   async init() {
@@ -277,11 +310,11 @@ class P extends E {
       return;
     }
     await this.ready, this.metrics.start();
-    const t = this._config.refreshInterval && this._config.refreshInterval > 500 ? this._config.refreshInterval : d;
+    const t = this._config.refreshInterval && this._config.refreshInterval > 500 ? this._config.refreshInterval : m;
     await this.initialFetchFeatures(), t > 0 && (this.timerRef = setInterval(() => this.fetchFeatures(), t));
   }
   async getLastRefreshTimestamp() {
-    const t = await this.storage.get(this.lastUpdateKey), e = await p({
+    const t = await this.storage.get(this.lastUpdateKey), e = await g({
       appName: this._config.appName,
       sessionId: this._config.sessionId,
       currentTime: this._config.currentTime,
@@ -297,7 +330,7 @@ class P extends E {
   async storeLastRefreshTimestamp() {
     this.lastRefreshTimestamp = Date.now();
     const e = {
-      key: await p({
+      key: await g({
         appName: this._config.appName,
         sessionId: this._config.sessionId,
         currentTime: this._config.currentTime,
@@ -314,7 +347,7 @@ class P extends E {
     return t || (t = Math.floor(Math.random() * 1e9), await this.storage.save(f, t.toString(10))), t.toString(10);
   }
   isUpToDate() {
-    const t = Date.now(), e = this._config.refreshInterval && this._config.refreshInterval > 500 ? this._config.refreshInterval : d;
+    const t = Date.now(), e = this._config.refreshInterval && this._config.refreshInterval > 500 ? this._config.refreshInterval : m;
     return this.lastRefreshTimestamp > 0 && this.lastRefreshTimestamp <= t && t - this.lastRefreshTimestamp <= e;
   }
   initialFetchFeatures() {
@@ -326,7 +359,7 @@ class P extends E {
   }
   async fetchFeatures() {
     if (this.fetch) {
-      this.abortController && this.abortController.abort(), this.abortController = F();
+      this.abortController && this.abortController.abort(), this.abortController = vt();
       const t = this.abortController ? this.abortController.signal : void 0;
       try {
         const e = new URL("/ab/v1/feature/frontend", this.url), i = "GET";
@@ -342,8 +375,8 @@ class P extends E {
         if (this.state === "error" && r.status < 400 && (this.state = "healthy", this.emit(h.RECOVERED)), r.ok) {
           this.etag = r.headers.get("ETag") || "";
           const n = await r.json();
-          await this.storeFeatures(n), this.state !== "healthy" && (this.state = "healthy"), this.fetchedFromServer || (this.fetchedFromServer = !0, this.setReady()), this.storeLastRefreshTimestamp();
-        } else r.status === 304 ? this.storeLastRefreshTimestamp() : (console.error(
+          await this.storeFeatures(n), this.state !== "healthy" && (this.state = "healthy"), this.fetchedFromServer || (this.fetchedFromServer = !0, this.setReady()), await this.storeLastRefreshTimestamp();
+        } else r.status === 304 ? await this.storeLastRefreshTimestamp() : (console.error(
           "AbFlags: Fetching feature toggles did not have an ok response"
         ), this.state = "error", this.emit(h.ERROR, {
           type: "HttpError",
@@ -367,10 +400,10 @@ class P extends E {
   }
   getHeaders() {
     const t = {
-      [y]: this._config.clientKey,
+      [q]: this._config.clientKey,
       Accept: "application/json"
     };
-    return t["Content-Type"] = "application/json", this.etag && (t["If-None-Match"] = this.etag), Object.entries(this._config.customHeaders ?? {}).filter(v).forEach(([e, i]) => t[e] = i), t;
+    return t["Content-Type"] = "application/json", this.etag && (t["If-None-Match"] = this.etag), Object.entries(this._config.customHeaders ?? {}).filter(z).forEach(([e, i]) => t[e] = i), t;
   }
   isEnabled(t) {
     var i;
@@ -379,6 +412,6 @@ class P extends E {
   }
 }
 export {
-  P as AbClient
+  It as AbClient
 };
 //# sourceMappingURL=index.esm.js.map

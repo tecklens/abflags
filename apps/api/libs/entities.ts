@@ -1,4 +1,5 @@
 import {
+  CustomerEntity, CustomerInsightsEntity,
   UserEntity,
 } from './user';
 import {BugReportEntity} from "./bug-report";
@@ -32,4 +33,6 @@ export const entities = [
   ApplicationEntity,
   FeatureStrategyEntity,
   FeatureVariantEntity,
+  CustomerEntity,
+  CustomerInsightsEntity,
 ];

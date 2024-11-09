@@ -1,13 +1,13 @@
-import { DataSource, Repository } from 'typeorm';
-import { Injectable, Logger } from '@nestjs/common';
-import { ClientMetricEntity } from '@repository/client-metric/client-metric.entity';
-import {FeatureId} from "@abflags/shared";
+import {DataSource, Repository} from 'typeorm';
+import {Injectable, Logger} from '@nestjs/common';
+import {ClientMetricEntity} from '@repository/client-metric/client-metric.entity';
 import {format} from "date-fns";
 import {find} from "lodash";
 
 @Injectable()
 export class ClientMetricRepository extends Repository<ClientMetricEntity> {
   private readonly logger = new Logger(ClientMetricRepository.name);
+
   constructor(private dataSource: DataSource) {
     super(ClientMetricEntity, dataSource.createEntityManager());
   }
@@ -94,5 +94,35 @@ export class ClientMetricRepository extends Repository<ClientMetricEntity> {
     }
 
     return rlt;
+  }
+
+  async analysisOsByEnvironmentId({
+                                         environmentId,
+                                       }: {
+    environmentId: string;
+  }) {
+    return await this.createQueryBuilder('c')
+      .select([
+        'c.os as os',
+        'count(c.os) as value',
+      ])
+      .where(`c.os is not null and c.environment_id = '${environmentId}'`)
+      .groupBy(`c.os`)
+      .getRawMany();
+  }
+
+  async analysisEnvByEnvironmentId({
+                                    environmentId,
+                                  }: {
+    environmentId: string;
+  }) {
+    return await this.createQueryBuilder('c')
+      .select([
+        'c.environment as environment',
+        'count(c.environment) as value',
+      ])
+      .where(`c.environment is not null and c.environment_id = '${environmentId}'`)
+      .groupBy(`c.environment`)
+      .getRawMany();
   }
 }

@@ -1,9 +1,9 @@
 /// <reference types='vitest' />
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
+import {nxViteTsPaths} from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import {nxCopyAssetsPlugin} from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig({
   root: __dirname,
@@ -44,6 +44,24 @@ export default defineConfig({
     rollupOptions: {
       // External packages that should not be bundled into your library.
       external: [],
+      output: [
+        {
+          dir: './libs/js-sdk/build',
+          format: 'umd',
+          sourcemap: true,
+          name: 'ab', // the global which can be used in a browser
+        },
+        {
+          dir: './libs/js-sdk/build',
+          format: 'esm',
+          sourcemap: true,
+        },
+        {
+          dir: './build',
+          format: 'cjs',
+          sourcemap: true,
+        }
+      ],
     },
   },
 

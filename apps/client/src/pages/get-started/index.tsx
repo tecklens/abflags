@@ -10,6 +10,7 @@ import { AnimatePresence } from 'framer-motion'
 import EnvironmentGetStarted from '@client/pages/get-started/components/EnvironmentGetStarted'
 import UseSdkGetStarted from '@client/pages/get-started/components/UseSdkGetStarted'
 import ProjectGetStarted from "@client/pages/get-started/components/ProjectGetStarted";
+import {TOP_NAV} from "@client/constant";
 
 const tabs = [
   {
@@ -31,13 +32,13 @@ const tabs = [
 ]
 export default function GetStarted() {
   const { theme } = useTheme()
-  const [tab, setTab] = useState('provider')
+  const [tab, setTab] = useState('project')
 
   return (
     <Layout>
       {/* ===== Top Heading ===== */}
       <LayoutHeader>
-        <TopNav links={[]} />
+        <TopNav links={TOP_NAV} />
         <div className="ml-auto flex items-center space-x-4">
           <Search />
           <ThemeSwitch />
@@ -52,7 +53,7 @@ export default function GetStarted() {
           </h1>
         </div>
         <div className={'flex space-x-3 lg:space-x-6 w-full'}>
-          <div className={'flex flex-col space-y-2 gap-4 w-[200px] font-semibold my-6'}>
+          <div className={'flex flex-col space-y-2 gap-4 min-w-[200px] font-semibold my-6'}>
             {tabs.map(e => (
               <div
                 key={e.key}

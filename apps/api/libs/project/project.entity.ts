@@ -47,4 +47,6 @@ export class ProjectEntity implements IProject {
   @ManyToOne(() => UserEntity)
   @JoinColumn([{name: 'created_by', referencedColumnName: '_id'}])
   owner: UserEntity;
+
+  totalFlags?: number;
 }

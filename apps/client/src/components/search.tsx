@@ -1,4 +1,4 @@
-import { Input } from '@client/components/ui/input'
+import {Input} from '@client/components/ui/input'
 import {
   CommandDialog,
   CommandEmpty,
@@ -9,18 +9,10 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from '@client/components/ui/command'
-import {
-  IconComponents,
-  IconCreditCard,
-  IconHierarchy2,
-  IconLayoutDashboard,
-  IconPlus,
-  IconSettings,
-  IconUser,
-} from '@tabler/icons-react'
+import {IconHierarchy2, IconLayoutDashboard, IconSettings, IconUser,} from '@tabler/icons-react'
 import React from 'react'
-import { throttle } from 'lodash'
-import { useNavigate } from 'react-router-dom'
+import {throttle} from 'lodash'
+import {useNavigate} from 'react-router-dom'
 
 export function Search() {
   const [open, setOpen] = React.useState(false)
@@ -55,21 +47,13 @@ export function Search() {
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Suggestions">
-            <CommandItem onSelect={() => onRoute('/workflow')}>
+            <CommandItem onSelect={() => onRoute('/')}>
               <IconHierarchy2 className="mr-2 h-4 w-4" />
-              <span className={'font-semibold'}>Go to Workflow</span>
-            </CommandItem>
-            <CommandItem onSelect={() => onRoute('/workflow?openCreate=true')}>
-              <IconPlus className="mr-2 h-4 w-4" />
-              <span>Create Workflow</span>
+              <span className={'font-semibold'}>Go to Feature Dashboard</span>
             </CommandItem>
             <CommandItem onSelect={() => onRoute('/')}>
               <IconLayoutDashboard className="mr-2 h-4 w-4" />
-              <span>Go to Dashboard</span>
-            </CommandItem>
-            <CommandItem onSelect={() => onRoute('/provider')}>
-              <IconComponents className="mr-2 h-4 w-4" />
-              <span>Go to Provider</span>
+              <span>Open variable</span>
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
@@ -87,11 +71,11 @@ export function Search() {
               <span>Go to Profile</span>
               <CommandShortcut>⌘P</CommandShortcut>
             </CommandItem>
-            <CommandItem onSelect={() => onRoute('/settings/billing')}>
-              <IconCreditCard className="mr-2 h-4 w-4" />
-              <span className={'font-semibold'}>Go to Billing</span>
-              <CommandShortcut>⌘B</CommandShortcut>
-            </CommandItem>
+            {/*<CommandItem onSelect={() => onRoute('/settings/billing')}>*/}
+            {/*  <IconCreditCard className="mr-2 h-4 w-4" />*/}
+            {/*  <span className={'font-semibold'}>Go to Billing</span>*/}
+            {/*  <CommandShortcut>⌘B</CommandShortcut>*/}
+            {/*</CommandItem>*/}
             <CommandItem  onSelect={() => onRoute('/settings')}>
               <IconSettings className="mr-2 h-4 w-4" />
               <span>Go to Settings</span>

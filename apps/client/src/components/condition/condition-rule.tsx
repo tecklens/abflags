@@ -184,7 +184,7 @@ const ConditionRuleValue = memo(
     }
 
     if (inputProps?.type === 'string') {
-      if (operator === 'contains') {
+      if (operator === Operator.IN) {
         return (
           <TagInput
             maxTags={10}
@@ -297,7 +297,7 @@ export default function ConditionRule({
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>contains</SelectLabel>
+                  <SelectLabel>Operator</SelectLabel>
                   {ops?.value?.map((e) => (
                     <SelectItem key={e} value={e}>
                       {e}
@@ -309,9 +309,16 @@ export default function ConditionRule({
 
           {readonly ?
             <div className={'inline-flex gap-2 items-center'}>
-              <Badge variant={'secondary'}>{rule.value?.toString()}</Badge>
-              <Button size={'smallicon'} variant={'outline'}
-                      onClick={() => onCopyToClipboard(rule.value?.toString() ?? '')}>
+              <Badge
+                variant={'secondary'}>{Array.isArray(rule.value) ? rule.value?.map(e => typeof e !== "string" ? e?.text : '')?.toString() : rule.value?.toString()}</Badge>
+              <Button
+                size={'smallicon'}
+                variant={'outline'}
+                onClick={() => onCopyToClipboard(
+                  (Array.isArray(rule.value)
+                    ? rule.value?.map(e => typeof e !== "string" ? e?.text : '')?.toString()
+                    : rule.value?.toString()) ?? ''
+                )}>
                 <IconCopy size={10}/>
               </Button>
             </div>

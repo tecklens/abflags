@@ -4,6 +4,7 @@ import {ClientMetricRepository} from '@repository/client-metric';
 import {LastSeenAtMetricService} from '@app/metric/last-seen-at-metric.service';
 import {Cron, CronExpression} from '@nestjs/schedule';
 import {AnalysisMetricDto, ClientBucketMetricDto} from "@app/metric/dtos";
+import {get, reduce} from "lodash";
 
 @Injectable()
 export class MetricService {
@@ -30,6 +31,8 @@ export class MetricService {
       start: metrics.bucket.start,
       end: metrics.bucket.end,
       createdAt: metrics.createdAt,
+      os: metrics.os,
+      environment: metrics.environment,
     }));
     this.unsavedMetrics = [...this.unsavedMetrics, ...transformMetrics];
     this.lastSeenAtMetricService.updateLastSeen(transformMetrics);
@@ -89,5 +92,41 @@ export class MetricService {
       limit: 48,
       period: payload.period,
     });
+  }
+
+  async analysisMetricsProject(u: IJwtPayload) {
+    const rlt =  await this.clientMetricRepository.analysisOsByEnvironmentId({
+      environmentId: u.environmentId,
+    });
+
+    const map = reduce(rlt, (r ,v) => ({
+      ...rlt,
+      [v.os]: v.value,
+    }), {})
+
+    return {
+      'mac-os': get(map, 'mac-os') ? parseInt(get(map, 'mac-os')) : 0,
+      'android': get(map, 'android') ? parseInt(get(map, 'android')) : 0,
+      'window': get(map, 'window') ? parseInt(get(map, 'window')) : 0,
+      'linux': get(map, 'linux') ? parseInt(get(map, 'linux')) : 0,
+      'ios': get(map, 'ios') ? parseInt(get(map, 'ios')) : 0,
+    }
+  }
+
+  async analysisEnvMetricProject(u: IJwtPayload) {
+    const rlt =  await this.clientMetricRepository.analysisEnvByEnvironmentId({
+      environmentId: u.environmentId,
+    });
+
+    const map = reduce(rlt, (r ,v) => ({
+      ...rlt,
+      [v.environment]: v.value,
+    }), {})
+
+    return {
+      'browser': get(map, 'browser') ? parseInt(get(map, 'browser')) : 0,
+      'backend': get(map, 'backend') ? parseInt(get(map, 'backend')) : 0,
+      'web-worker': get(map, 'web-worker') ? parseInt(get(map, 'web-worker')) : 0,
+    }
   }
 }

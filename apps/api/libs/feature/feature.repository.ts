@@ -86,9 +86,10 @@ export class FeatureRepository extends Repository<FeatureEntity> {
       .getRawMany();
   }
 
-  async existByName(name: string) {
+  async existByName(name: string, projectId: ProjectId) {
     return this.existsBy({
-      name: name
+      name: name,
+      _projectId: projectId
     })
   }
 
@@ -104,5 +105,23 @@ export class FeatureRepository extends Repository<FeatureEntity> {
       },
       relations: ['strategies']
     })
+  }
+
+  async countByProjectIds(projectIds: string[]) {
+    if (projectIds && projectIds.length > 0)
+      return this.createQueryBuilder('p')
+        .select(['p.project_id as projectId', 'count(p._id) as totalFlag'])
+        .where('p.project_id in (:ids)', {ids: projectIds})
+        .groupBy('p.project_id')
+        .getRawMany<any>();
+    else return [];
+  }
+
+  async groupByType(environmentId: string) {
+    return this.createQueryBuilder('f')
+      .select(['f.type as type', 'count(f.type) as value'])
+      .where(`f.environment_id  = '${environmentId}'`)
+      .groupBy('f.type')
+      .getRawMany();
   }
 }

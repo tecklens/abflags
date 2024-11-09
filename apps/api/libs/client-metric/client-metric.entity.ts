@@ -1,25 +1,29 @@
 import {Column, CreateDateColumn, Entity, Index, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
-import { IClientMetric } from '@abflags/shared';
+import {IClientMetric} from '@abflags/shared';
 
 @Entity('client_metric')
 export class ClientMetricEntity implements IClientMetric {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Index()
-  @Column({ name: 'feature_name', length: 64 })
+  @Column({name: 'feature_name', length: 64})
   featureName: string;
-  @Column({ name: 'environment_id', length: 64, nullable: true })
+  @Column({name: 'environment_id', length: 64, nullable: true})
   environmentId: string;
-  @Column({ name: 'app_name', length: 255 })
+  @Column({name: 'app_name', length: 255})
   appName: string;
-  @Column({ name: 'start', type: 'datetime', nullable: true })
+  @Column({name: 'start', type: 'datetime', nullable: true})
   start: Date;
-  @Column({ name: 'end', type: 'datetime', nullable: true })
+  @Column({name: 'end', type: 'datetime', nullable: true})
   end: Date;
-  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
+  @CreateDateColumn({name: 'created_at', type: 'datetime'})
   createdAt: Date;
-  @Column({ name: 'yes' })
+  @Column({name: 'yes'})
   yes: number;
-  @Column({ name: 'no' })
+  @Column({name: 'no'})
   no: number;
+  @Column({name: 'os', nullable: true, length: 64})
+  os: string;
+  @Column({name: 'environment', nullable: true, length: 64})
+  environment: string;
 }

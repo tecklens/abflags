@@ -59,7 +59,7 @@ export const getDateDistance = (createdAt: Date | undefined) => {
   return formatDistance(createdAt ?? new Date(), new Date(), { addSuffix: true, locale: en });
 }
 
-function nFormatter(num: number, digits: number) {
+export function nFormatter(num: number, digits: number) {
   const lookup = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "k" },

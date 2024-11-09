@@ -1,6 +1,6 @@
 "use client"
 
-import {Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis} from "recharts"
+import {Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis} from "recharts"
 
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "@client/components/ui/card"
 import {
@@ -15,18 +15,18 @@ import {IconTrendingUp} from "@tabler/icons-react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@client/components/ui/select";
 import {useMetric} from "@client/lib/store/metricStore";
 import {IFeature} from "@abflags/shared";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 export const description = "A multiple line chart"
 
 const chartConfig = {
   yes: {
     label: "Visible",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-2))",
   },
   no: {
     label: "Invisible",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
 
@@ -75,6 +75,13 @@ export default function FeatureMetric({feature}: { feature: IFeature }) {
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                width={40}
+                style={{userSelect: "none"}}
               />
               <ChartTooltip content={<ChartTooltipContent hideLabel/>}/>
               <ChartLegend content={<ChartLegendContent/>}/>

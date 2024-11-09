@@ -65,13 +65,13 @@ const router = createBrowserRouter([
           {
             path: 'analysis',
             lazy: async () => ({
-              Component: (await import('@client/components/coming-soon')).default,
+              Component: (await import('@client/pages/analysis')).default,
             }),
           },
           {
-            path: 'overview',
+            path: 'customer',
             lazy: async () => ({
-              Component: (await import('@client/pages/overview')).default,
+              Component: (await import('@client/pages/customer')).default,
             }),
           },
           {
@@ -87,12 +87,12 @@ const router = createBrowserRouter([
                   Component: (await import('./pages/settings/profile')).default,
                 }),
               },
-              {
-                path: 'account',
-                lazy: async () => ({
-                  Component: (await import('./pages/settings/account')).default,
-                }),
-              },
+              // {
+              //   path: 'account',
+              //   lazy: async () => ({
+              //     Component: (await import('./pages/settings/account')).default,
+              //   }),
+              // },
               {
                 path: 'appearance',
                 lazy: async () => ({

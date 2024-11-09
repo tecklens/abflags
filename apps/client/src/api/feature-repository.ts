@@ -40,4 +40,13 @@ export default {
   deleteStrategy(id: FeatureId, strategyId: FeatureStrategyId) {
     return BaseRepository.delete(`${resource}/${id}/strategy/${strategyId}`)
   },
+  totalByType() {
+    return BaseRepository.get(`${resource}/feature-by-type`)
+  },
+  analysisCustomer(params: any) {
+    return BaseRepository.get(`${resource}/anal-customer`, {params})
+  },
+  updateDescription(id: FeatureId, payload: any) {
+    return BaseRepository.put(`${resource}/${id}/update/description`, payload)
+  },
 }

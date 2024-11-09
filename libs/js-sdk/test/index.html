@@ -7,7 +7,7 @@
   <script type="module">
     const client = new ab.AbClient({
       url: 'http://localhost:3232',
-      clientKey: '341f4ac0a2aeffc4b6ac2f6c89a92143',
+      clientKey: '995a84362fc6da5228dc12f0e1d06607',
       appName: 'test',
       userId: '1',
       refreshInterval: 5000,
@@ -23,7 +23,7 @@
     client.on('impression', () => console.log('impression'));
     client.on('update', () => {
         console.log('update', client.isEnabled('fsdsdsdsdsd'))
-        if (client.isEnabled('fsdsdsdsdsd')) {
+        if (client.isEnabled('feature2')) {
           document.getElementById("test-a").style.display = 'flex';
           document.getElementById("test-b").style.display = 'none';
         } else {
@@ -31,7 +31,7 @@
           document.getElementById("test-b").style.display = 'flex';
         }
 
-      client.isEnabled('sdsdsdsdsd')
+      client.isEnabled('feature1')
       }
     );
 

@@ -1,4 +1,5 @@
-import {AbContext} from "../types";
+import {AbContext, Environment} from "../types";
+import {isBrowser, isIos, isLinux, isMacOs, isNode, isWindows} from 'environment';
 
 export const EVENTS = {
   INIT: 'initialized',
@@ -77,3 +78,18 @@ export const resolveAbortController = () => {
     console.error('Unleash failed to resolve "AbortController" factory', e);
   }
 };
+
+export const currentEnvironment: () => Environment = () => {
+  return {
+    os: isMacOs ? 'mac-os'
+      : isWindows ? 'window'
+        : isLinux ? 'linux'
+          : isIos ? 'ios'
+            : 'android',
+    environment: isBrowser
+      ? 'browser'
+      : isNode
+        ? 'backend'
+        : 'web-worker'
+  }
+}

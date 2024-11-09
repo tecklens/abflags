@@ -8,15 +8,14 @@ import {
   IconTrendingDown,
   IconTrendingUp
 } from "@tabler/icons-react";
-import ChartRadialLabel from "@client/pages/projects/components/insights/chart-radial-label";
-import ChartPieInteractive from "@client/pages/projects/components/insights/chart-pie-interactive";
-import {Card, CardHeader} from "@client/components/ui/card";
+import OsProjectOverview from "@client/pages/projects/components/insights/os-project-overview";
+import EnvironmentProjectOverview from "@client/pages/projects/components/insights/environment-project-overview";
+import {Card, CardContent, CardHeader} from "@client/components/ui/card";
+import FeatureTotalByType from "@client/pages/projects/components/insights/feature-total-by-type";
 
 export default function ProjectInsights() {
   const {token} = useAuth()
   const {insights, fetchInsights} = useProject();
-
-  console.log(insights)
 
   useEffect(() => {
     fetchInsights()
@@ -108,12 +107,15 @@ export default function ProjectInsights() {
       </div>
 
       <div className={'grid grid-cols-2 gap-2'}>
-        <ChartRadialLabel/>
-        <ChartPieInteractive/>
+        <OsProjectOverview/>
+        <EnvironmentProjectOverview/>
       </div>
       <div className={'grid grid-cols-2 gap-2'}>
         <Card>
-          <CardHeader>Feature types used</CardHeader>
+          <CardHeader className={'font-semibold'}>Feature types used</CardHeader>
+          <CardContent>
+            <FeatureTotalByType />
+          </CardContent>
         </Card>
       </div>
     </div>

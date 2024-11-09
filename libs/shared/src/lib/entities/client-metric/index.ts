@@ -10,4 +10,6 @@ export interface IClientMetric {
   createdAt: Date;
   yes: number;
   no: number;
+  os: string;
+  environment: string;
 }

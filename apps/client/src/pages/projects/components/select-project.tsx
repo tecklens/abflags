@@ -6,7 +6,7 @@ import {
   IconAdjustmentsHorizontal,
   IconHeartbeat, IconMinus,
   IconSortAscendingLetters,
-  IconSortDescendingLetters, IconStar
+  IconSortDescendingLetters, IconStar, IconStarFilled
 } from "@tabler/icons-react";
 import {Separator} from "@client/components/ui/separator";
 import {Link, useNavigate} from "react-router-dom";
@@ -20,7 +20,7 @@ import {throttle} from "lodash";
 import {useUser} from "@client/lib/store/userStore";
 
 export default function SelectProject() {
-  const {projects, fetchProjects, openSelectProject, setOpenSelectProject} = useProject()
+  const {starProjects, projects, fetchProjects, openSelectProject, setOpenSelectProject} = useProject()
   const [sort, setSort] = useState('ASC')
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -35,6 +35,11 @@ export default function SelectProject() {
     if (openSelectProject)
       fetchData()
   }, [openSelectProject, searchTerm, sort])
+
+  const finalProjects = projects.map(p => ({
+    ...p,
+    star: starProjects.includes(p._id)
+  }))
 
   return (
     <Dialog open={openSelectProject} onOpenChange={setOpenSelectProject}>
@@ -81,7 +86,7 @@ export default function SelectProject() {
           </div>
           <Separator className="shadow"/>
           <ul className="overflow-y-auto grid gap-4 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((app: IProject) => (
+            {finalProjects.map((app: IProject & {star: boolean}) => (
               <ProjectCard app={app} key={app._id}/>
             ))}
           </ul>
@@ -91,9 +96,9 @@ export default function SelectProject() {
   )
 }
 
-const ProjectCard = ({app}: { app: IProject }) => {
+const ProjectCard = ({app}: { app: IProject & {star: boolean} }) => {
   const {switchProject} = useUser()
-  const {setOpenSelectProject} = useProject()
+  const {setOpenSelectProject, starProject, unStarProject} = useProject()
   const selectProject = (project: IProject) => {
     switchProject(project._id)
     setOpenSelectProject(false)
@@ -117,13 +122,21 @@ const ProjectCard = ({app}: { app: IProject }) => {
         variant="ghost"
         size="icon"
         className={``}
+        onClick={(e) => {
+          e.stopPropagation()
+          if (app.star) {
+            unStarProject(app._id)
+          } else {
+            starProject(app._id)
+          }
+        }}
       >
-        <IconStar size={18}/>
+        {app.star ? <div className={'text-yellow-500'}><IconStarFilled size={18} /></div> : <IconStar size={18}/>}
       </Button>
     </div>
     <div className={'w-full px-3 py-2 inline-flex justify-between text-xs items-center'}>
       <div className={'flex flex-col'}>
-        <span><span className={'font-semibold'}>1</span> flag</span>
+        <span><span className={'font-semibold'}>{app.totalFlags}</span> flag</span>
         <span><span className={'font-semibold'}>100%</span> health</span>
       </div>
 

@@ -4,11 +4,12 @@ import {FeatureService} from "@app/feature/feature.service";
 import {UserSession} from "@abtypes/user.session";
 import {FeatureId, FeatureStrategyId, IFeatureStrategy, IJwtPayload} from "@abflags/shared";
 import {
+  AnalysisCustomerRequest,
   CreateFeatureRequestDto,
   CreateStrategyRequest,
   FeatureDto,
   FrontendFeatureRequest,
-  GetFeatureRequestDto, UpdateStrategyRequest
+  GetFeatureRequestDto, UpdateFeatureDescriptionRequest, UpdateStrategyRequest
 } from "@app/feature/dtos";
 import {ApiKeyAuthGuard, JwtAuthGuard} from "@app/auth/strategy";
 import {ApiResponse, ExternalApiAccessible} from "@abtypes/decorators";
@@ -58,6 +59,20 @@ export class FeatureController {
     return this.featureService.getFrontendFeature(user, payload)
   }
 
+  @Get('feature-by-type')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  getFeatureByType(@UserSession() user: IJwtPayload) {
+    return this.featureService.getFeatureByType(user)
+  }
+
+  @Get('anal-customer')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  getAnalysisCustomer(@UserSession() user: IJwtPayload, @Query() payload: AnalysisCustomerRequest) {
+    return this.featureService.analysisCustomerByHour(user, payload)
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   getFeatureById(@UserSession() user: IJwtPayload, @Param('id') id: FeatureId) {
@@ -84,6 +99,16 @@ export class FeatureController {
     @Body() payload: CreateStrategyRequest,
   ) {
     return this.featureService.createStrategy(user, id, payload)
+  }
+
+  @Put(':id/update/description')
+  @UseGuards(JwtAuthGuard)
+  updateDescription(
+    @UserSession() user: IJwtPayload,
+    @Param('id') id: FeatureId,
+    @Body() payload: UpdateFeatureDescriptionRequest,
+  ) {
+    return this.featureService.updateFeatureDescription(user, id, payload)
   }
 
   @Put(':id/strategy')

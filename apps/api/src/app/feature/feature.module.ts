@@ -4,8 +4,10 @@ import {FeatureController} from './feature.controller';
 import {FeatureHealthRepository, FeatureRepository, FeatureStrategyRepository} from '@repository/feature';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {BullModule} from "@nestjs/bullmq";
+import {CustomerInsightsRepository, CustomerRepository} from "@repository/user";
+import {ProjectRepository} from "@repository/project";
 
-const repositories = [FeatureRepository, FeatureHealthRepository, FeatureStrategyRepository];
+const repositories = [ProjectRepository, FeatureRepository, FeatureHealthRepository, FeatureStrategyRepository, CustomerRepository, CustomerInsightsRepository];
 
 @Module({
   imports: [

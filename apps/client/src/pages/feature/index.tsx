@@ -19,7 +19,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '../../components/ui/tabs';
-import ComingSoon from '@client/components/coming-soon';
 import FeatureOverview from './components/feature-overview';
 import {
   Breadcrumb,
@@ -30,9 +29,11 @@ import {
   BreadcrumbSeparator,
 } from '../../components/ui/breadcrumb';
 import FeatureMetric from "@client/pages/feature/components/feature-metric";
-import {StringParam, useQueryParams, withDefault} from "use-query-params";
+import {NumberParam, StringParam, useQueryParams, withDefault} from "use-query-params";
 import EventLog from "@client/pages/feature/components/event-log";
 import FeatureSetting from "@client/pages/feature/components/feature-setting";
+import {TopNav} from "@client/components/top-nav";
+import {TOP_NAV} from "@client/constant";
 
 const FeatureRepository = RepositoryFactory.get('feature');
 
@@ -41,6 +42,7 @@ export default function FeatureDetail() {
 
   const [query, setQuery] = useQueryParams({
     tab: withDefault(StringParam, 'overview'),
+    v: withDefault(NumberParam, 1)
   });
   const {toast} = useToast();
   const navigate = useNavigate();
@@ -67,7 +69,7 @@ export default function FeatureDetail() {
         }
       })
       .finally(() => setIsLoading(false));
-  }, [id]);
+  }, [id, query.v]);
 
   useEffect(() => {
     if (id) {
@@ -81,6 +83,7 @@ export default function FeatureDetail() {
     <Layout>
       {/* ===== Top Heading ===== */}
       <LayoutHeader>
+        <TopNav links={TOP_NAV} />
         <Search/>
         <div className="ml-auto flex items-center space-x-4">
           <ThemeSwitch/>

@@ -25,6 +25,7 @@ import {InjectQueue} from "@nestjs/bullmq";
 import {Queue} from "bullmq";
 import {Transactional} from "typeorm-transactional";
 import {Not} from "typeorm";
+import {find, get} from "lodash";
 
 @Injectable()
 export class ProjectService {
@@ -43,14 +44,17 @@ export class ProjectService {
   async getProject(u: IJwtPayload, payload: SearchProjectDto): Promise<ProjectDto[]> {
     const members = await this.memberRepository.findMemberByUserId(u._id)
 
-    const rlt = await this.projectRepository.findByProjectIdIn(
+    const rlt: ProjectEntity[] = await this.projectRepository.findByProjectIdIn(
       members.map(e => e._projectId),
       payload.sortType,
       payload.name
     );
 
+    const countFlags = await this.featureRepository.countByProjectIds(rlt.map(e => e._id))
+
     return rlt.map(p => ({
       ...p,
+      totalFlags: find(countFlags, e => e.projectId === p._id)?.totalFlag ?? 0,
       owner: {
         email: p.owner.email,
         firstName: p.owner.firstName,

@@ -16,6 +16,8 @@ import { Layout, LayoutBody, LayoutHeader } from '@client/components/custom/layo
 import SidebarNav from './components/sidebar-nav'
 import React from 'react'
 import { useTheme } from '@client/components/theme-provider'
+import {TOP_NAV} from "@client/constant";
+import {TopNav} from "@client/components/top-nav";
 
 export default function Settings() {
   const {theme} = useTheme()
@@ -23,8 +25,9 @@ export default function Settings() {
     <Layout fadedBelow fixedHeight>
       {/* ===== Top Heading ===== */}
       <LayoutHeader>
-        <Search />
+        <TopNav links={TOP_NAV} />
         <div className='ml-auto flex items-center space-x-4'>
+          <Search />
           <ThemeSwitch />
           <UserNav />
         </div>
@@ -61,11 +64,11 @@ const sidebarNavItems = [
     icon: <IconUser size={18} />,
     href: '/settings',
   },
-  {
-    title: 'Account',
-    icon: <IconTool size={18} />,
-    href: '/settings/account',
-  },
+  // {
+  //   title: 'Account',
+  //   icon: <IconTool size={18} />,
+  //   href: '/settings/account',
+  // },
   {
     title: 'Change Password',
     icon: <IconLockAccess size={18} />,

@@ -7,7 +7,7 @@ export default function FeatureSetting({feature}: { feature: IFeature }) {
   if (!feature) return <Empty />
   return (
     <Card>
-      <CardHeader>Settings</CardHeader>
+      <CardHeader className={'font-bold text-xl'}>Settings</CardHeader>
       <CardContent className={'flex flex-col gap-3'}>
         <div className={'font-semibold text-xl'}>Feature information</div>
         <div className={'inline-flex gap-1'}>

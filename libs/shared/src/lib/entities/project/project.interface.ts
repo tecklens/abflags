@@ -28,6 +28,8 @@ export interface IProject {
   externalId?: string;
 
   owner?: IUser;
+
+  totalFlags?: number;
 }
 
 export interface IProjectStats {

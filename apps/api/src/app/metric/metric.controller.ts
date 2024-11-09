@@ -34,4 +34,25 @@ export class MetricController {
   ) {
     return this.metricService.analysisMetrics(user, payload);
   }
+
+  @Get('anal-project')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'API analysis metric of client sdk',
+  })
+  analysisMetricProject(
+    @UserSession() user: IJwtPayload
+  ) {
+    return this.metricService.analysisMetricsProject(user);
+  }
+
+  @Get('anal-project-env')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  analysisMetricProjectEnv(
+    @UserSession() user: IJwtPayload
+  ) {
+    return this.metricService.analysisEnvMetricProject(user);
+  }
 }

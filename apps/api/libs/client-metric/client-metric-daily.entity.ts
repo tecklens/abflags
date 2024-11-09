@@ -22,4 +22,8 @@ export class ClientMetricDailyEntity implements IClientMetric {
   yes: number;
   @Column({ name: 'no' })
   no: number;
+  @Column({name: 'os', nullable: true, length: 64})
+  os: string;
+  @Column({name: 'environment', nullable: true, length: 64})
+  environment: string;
 }

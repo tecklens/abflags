@@ -3,6 +3,8 @@ export interface IClientMetricsEnvKey {
   appName: string;
   environmentId: string;
   createdAt: Date;
+  os?: string;
+  environment?: string;
 }
 
 export interface IClientMetricsEnv extends IClientMetricsEnvKey {

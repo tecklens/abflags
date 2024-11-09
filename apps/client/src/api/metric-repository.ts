@@ -8,4 +8,10 @@ export default {
       params: params
     })
   },
+  analyseProject() {
+    return BaseRepository.get(`${resource}/anal-project`)
+  },
+  analyseByEnv() {
+    return BaseRepository.get(`${resource}/anal-project-env`)
+  },
 }
