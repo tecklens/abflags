@@ -9,7 +9,7 @@
 
 ## Features
 
-Explore the [documentation](https://docs.abflags.wolfx.app) to discover plenty examples and unlock the full power of Docling!
+Explore the [documentation](https://github.com/tecklens/abflags/wiki) to discover plenty examples and unlock the full power of Docling!
 
 ---
 
